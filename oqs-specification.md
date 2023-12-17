@@ -1,52 +1,106 @@
 # RFC: OQS (Open Quick Script) Specification
 ## Abstract
-This document outlines the proposed design and functionality for Open Quick Script (OQS), a new scripting language developed with the intention to be system-agnostic, allowing for consistent execution across different platforms, provided that the executing environment adheres to the guidelines and standards set forth by this RFC.
+This document serves as the official Request For Comments (RFC) for the Open Quick Script (OQS) language specification. The goal of OQS is to provide a generic, lightweight, and system-agnostic scripting language to be easily integrated into any platform, capable of evaluating expressions with basic types and operators. The language should accept a single expression, accompanied by an optional dictionary/map/JSON of variables, and produce a result consistent with the expression's logic.
+
 
 
 ## Introduction
-OQS aims to provide a simple, expression-based scripting language that relies on passing a single expression and a dictionary/map/JSON object of variables for evaluation and execution, returning the result of the operation. The language will support basic arithmetic, comparison operators, and data types including lists. The goal is also to allow for easy extensibility while maintaining a core specification that any implementation must follow to ensure compatibility.
+OQS is designed to facilitate lightweight scripting across various systems, allowing for simple expressions involving mathematical, logical, and list operations to be evaluated in an isolated environment without any knowledge of the host system. Implementations of the language engine are free to be developed by any party, provided they adhere to the specifications outlined in this document.
+
 
 
 ## Language Specification
-### Basic Types
-1. **Numbers**: Integers and floating-point numbers
-2. **Booleans**: `true` or  `false`
-3. **Strings**: A sequence of characters
-4. **Lists**: An ordered collection of items
-
-### Operators
-1. **Arithmetic**: `+`, `-`, `*`, `/`
-2. **Comparison**: `<`, `>`, `<=`, `>=`, `!=` (These return boolean values.)
-3. **List**: `+` (concaternation of two lists)
-
-### Variables and Expressions
-1. **Variables**: A variable name must start with a letter or underscore, followed by letters, digits, or underscores.
-2. **Expressions**: A syntax for combining variables, literals, and operators to produce a value.
-
-### Evaluation
-1. **Single Expression**: The language engine evaluates a single expression per execution.
-2. **Variable Resolution**: Variables used in expressions are resolved using the provided dictionary/map/JSON object.
-3. **Return Value**: The resulting value from the execution is returned to the caller.
+### Expression Input
+The language engine MUST accept an input expression as a string. The expression can involve valriables, literals, and operators that will conform to the guidelines below.
 
 
-## Implementation Guidelines
-1. **Engine**: Any implentation engine must provide consistent results foir the same expression and input data across all platforms.
-2. **Extensibility**: Implementations may introduce additional features beyond the core specification but must still adhere to the core functionality to maintain interoperability.
-3. **Error Handlind**: Clear guidelines for error conditions, such as undefined variables and type errors, must be established and followed.
+### Variables Input
+The engine MUST accept an optional input which is a any number of key-value pairs containing variable names with their definitions. Examples include JSON object, dictionary, or map. The input MUST NOT be mandatory. if not provided, the engine SHOULD assume there are no valraibles to substitute within the expression.
 
 
-## Compatibility and Versioning
-1. **Backward Compatibility**: Every effort must be made to avoid breaking changes. When they are unavoidable, a clear upgrade path must be provided.
-2. **Versioning**: The Language will follow semantic versioning.
+### Output Format
+The engine SHOULD output results as a JSON object or map, indicating the result and any additional information regarding the evaluation (like any errors encountered).
 
 
-## Governance
-The OQS project will maintain an open governance model with the following components:
-1. **Core Team**: A group of maintainers who guide the development and curation of the RFC and its implementations.
-2. **Contributors**: Anyone can contribute to the project by submitting requests, enhancements, or bug fixes.
+### String-Embedded Expressions
+The engine MUST accept an optional boolean input `string_embedded` that defaults to `false`. If `true`, the engine MUST treat the input expression as a string where segments enclosed in `<{` and `}>` are evaluated as expressions. Each evaluated expression MUST be replaced in situ and the modified string returned as output.
 
-## Documentation
-The official documentation covering details of the core language specification, implementation guidelines, and basic usage examples will be provided alongside the RFC.
+
+### Type System
+OQS SHALL support the following basic types:
+- Number (Integers and floating-point)
+- Boolean
+- List
+- String
+
+
+### Supported Operators
+Operators define how different types interact with each other. The following is a specification of supported operators:
+
+#### Numerical Operators
+- `+`, `-`, `*`, `/`: For number types.
+
+#### Comparison Operators
+- `<`, `>`, `<=`, `>=`, `!=`: Operands MUST be of the same type and MUST return a Boolean value indicating the outcome of the comparison.
+
+#### List Operators
+- `+`: MUST append two lists together.
+An attempt to use an unsupported operator or use an operator on imcomplete types MUST result in an error.
+
+
+### Type Interactions 
+OQS SHALL define explicitly how types interact with each other:
+
+| Operator | Operand 1 | Operand 2 | Result   |
+|----------|-----------|-----------|----------|
+| +        | Number    | Number    | Number   |
+| +        | List      | List      | List     |
+| -        | Number    | Number    | Number   |
+| *        | Number    | Number    | Number   |
+| /        | Number    | Number    | Number   |
+| <        | Number    | Number    | Boolean  |
+| <=       | Number    | Number    | Boolean  |
+| ==       | Any Type  | Any Type  | Boolean  |
+| !=       | Any Type  | Any Type  | Boolean  |
+| >        | Number    | Number    | Boolean  |
+| >=       | Number    | Number    | Boolean  |
+
+Note: "Any Type" indicatres that as long as both operands are of the same type, the comparison is valid.
+
+
+### Error Handling
+The language engine SHOULD return detailed errors in cases of:
+- Usage of undefined variables.
+- Incorrect type operations.
+- Syntax errors within expressions.
+
+
+### Examples
+The following are non-exhaustive examples of expected inputs and outputs:
+- **Input**: `{"expression": "1 + 2"}` **Output**: `{"results": 3}`
+- **Input**: `{"expression": "<{variable_1 * variable_2>} is the result.", "string_embedded": true, "variables": {"variable_1": 2, "variable_2": 3}}` **Output**: `{"results": "6 is the result"}`
+- **Input**: `{"expression": "variable_1 * variable_2", "variables": {"variable_1": 2, "variable_2": 3}}` **Output**: `{"results": 6}`
+
+
+### Implementation Guidelines
+- The specifications outlined in this RFC SHOULD be public and accessible for any potential implementer.
+- Implementers SHALL comply with the type system and operator interactions as described.
+- Error handling and reporting SHOULD be clear and as verbose as possible without compromising security.
+- Implementations MAY be open-source or proprietary.
+
+
+
+## Publication and Versioning
+- The RFC SHOULD be published as a Markdown file (`.md`) within a GitHub repository dedicatored to the project.
+- Susequent updates to the language specification should be tracked through versioning within the RFC document.
+- Discussion and revision proposals SHOULD be conducted through issues and pull requests within the GitHub repository to maintain a transparent record of changes and community involvement.
+
+
 
 ## Implementation Reference
 An open-source reference implementation will be made available, which follows the RFC as closely as possible and serves as a baseline for other implementations to compare against.
+
+
+
+## Conclusion
+The OQS language seeks to provide an easy-to-implement, system-agnostic scripting capability that prioritizes consistency and simplicity. Feedback and contributions to this RFC are welcomed to ensure OQS serves a wide range of use cases and remains adaptable for future needs.
