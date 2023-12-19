@@ -32,9 +32,9 @@ Engines are mandated to consider an optional boolean parameter `string_embedded`
   - Integers: Contains any numeric value not in quotations not containing any decimals `.`.
   - Decimals: Contains any numeric value not in quotations containing a single decimal `.`. Values not containing a leading number such as `.5` are still considered valid decimals. The same goes for values ending with a decimal such as `5.`
 - Booleans: Contains the values `true` and `false`.
-- Lists: Any number of values surrounded by square brackets `[]` and commas seperated when containing more than 1 value. Examples include `[1, "5"]` or `[1]`. Lists can contain a mixure of types. Lists maintain their order.
+- Lists: Any number of values surrounded by square brackets `[]` and commas seperated when containing more than 1 value. Examples include `[1, "5"]` or `[1]`. Lists can contain a mixture of types. Lists maintain their order.
 - Strings: Values surrounded by double-quotes `"value"` or single-quotes `'value'`. Empty strings are valid strings as well such as `''`.
-- Functions: Functions can be callable using `()` after the function name. Function names must start with an alphabetic character followed by any number of alpha-numeric characters and underscores or combination thereof.
+- Functions: Functions can be callable using `()` after the function name. Function names must start with an alphabetic character followed by any number of alphanumeric characters and underscores or combination thereof.
 - Nulls: Contains only the value `null` to indicate nothing.
 - Key-Value Stores (KVS): Enclosed in `{}`, keys are strings, values van be any type, including nested KVS. It can be empty.
 
@@ -55,28 +55,28 @@ Operators, which are foundational to the interaction between types, are clarifie
 - Subtraction `-`: Removes elements of the second list from the first one, if they are present.
 
 #### KVS Operators
-- Concaternation `+`: Required to merge two KVSs. If there are duplicate keys, it prioritizes the later decleration.
+- Concatenation `+`: Required to merge two KVSs. If there are duplicate keys, it prioritizes the later declaration.
 
 #### String Operators
 - Concatenation `+`: Combined two strings into one.
 - Subtraction `-`: Removes all instances of the entirety of the second string from the first string.
 - Repetition `*`L Repeats a string by the multiplier specified (must be a non-negative integer).
 
-#### Function Invation
+#### Function Invocation
 - The syntax for invoking functions is an identifier that starts with a letter followed by any combination of letters, numbers, or underscores, then an opening parenthesis `(`, an optional comma-seperated list of arguments, and a closing parentheses `)`.
 
 
-### Paretheses in Expressions
-- Parentheses `()` can be used in all expressions to seperate parts of the expressions and clarify priority. This is applicable in mathematical operations, string manipulation, and other contexts where expression clarity and evaluation order are crucial.
+### Parentheses in Expressions
+- Parentheses `()` can be used in all expressions to separate parts of the expressions and clarify priority. This is applicable in mathematical operations, string manipulation, and other contexts where expression clarity and evaluation order are crucial.
 
 
 ### Unpacking Syntax
 `OQS` includes an unpacking feature using the `*` notation. This allows for the expansion of list items directly into function arguments or for the creation of new lists.
 - In function calls, such as `INTEGER(*variable_1)` where `variable_1` contains `["1"]`, it will unpack the list and pass `"1"` as an argument to the `INTEGER` function, effectively calling `INTEGER("1")`.
 - For lists, the syntax `[*variable_1, *variable_2]` will combine the elements of `variable_1` and `variable_2` into a single list. For instance, if `variable_1 = [1, 2, 3]` and `variable_2 = [4, 5, 6]`, the result would be `[1, 2, 3, 4, 5, 6]`. This is functionally equivalent to using the `+` operator for list concatenation.
-`OQS` also includes unpacking KVS using the `**` noation. This allows for the expansion of KVS items directly into function arguments or for the creation of new KVSs.
+`OQS` also includes unpacking KVS using the `**` notation. This allows for the expansion of KVS items directly into function arguments or for the creation of new KVSs.
 - In all standard cases such as `LIST(**variable_1)` where `variable_1` contains `{"hello": 5}`, it will unpack the kvs and pass `"hello"` and `5` as two arguments to the `LIST` function effectively calling `LIST("hello", 5)`.
-- For KVS creation, the syntax `{**kvs1, **kvs_2}` will conbine the elements of `kvs1` and `kvs2` into a single KVS. For instnace is `kvs1 = {"hello": 5}` and `kvs2 = {"yello": 3}`, the result would be `{"hello": 5, "yello": 3}`. This is functionally equevalent to using the `+` operator for KVS concatenation.
+- For KVS creation, the syntax `{**kvs1, **kvs_2}` will combine the elements of `kvs1` and `kvs2` into a single KVS. For instance is `kvs1 = {"hello": 5}` and `kvs2 = {"yello": 3}`, the result would be `{"hello": 5, "yello": 3}`. This is functionally equivalent to using the `+` operator for KVS concatenation.
 
 
 ### Type Interactions 
@@ -124,28 +124,28 @@ Language engines are expected to provide comprehensive errors for issues such as
 - `DECIMAL(argument)`: Returns an Integer/String/Decimal in a Decimal representation.
 - `STRING(argument)`: Returns any single type in a String representation.
 - `LIST(argument1, argument2, ...)`: Returns a List containing the provided arguments in order.
-- `KVS(key1, value1, key2, value2, ..., keyN, valueN)`: Returns a kvs with all key value pairs. All keys must be strings. Raises an error if there is an odd amound of arguments.
-- `BOOLEAN(argument)`/`BOOL(argument)`: Returns a truthi evaluation of the argument. `0` or `0.0` will return `false` while any other number will return `true`. Empty strings or lists such as `""`, `''`, and `[]` will return `false` while the same examples with any characters or items will return `true`.
+- `KVS(key1, value1, key2, value2, ..., keyN, valueN)`: Returns a kvs with all key value pairs. All keys must be strings. Raises an error if there is an odd amount of arguments.
+- `BOOLEAN(argument)`/`BOOL(argument)`: Returns a truthy evaluation of the argument. `0` or `0.0` will return `false` while any other number will return `true`. Empty strings or lists such as `""`, `''`, and `[]` will return `false` while the same examples with any characters or items will return `true`.
 - `KEYS(kvs)`: Returns a list of all keys in a KVS.
 - `VALUES(kvs)`: Returns a list of all values in a KVS.
 - `UNIQUE(list)`: Returns a list of all unique values in a list.
 - `REVERSE(list)`: Returns a list in reverse order.
 - `MAX(number1, number2, ..., numberN)`: Returns the maximum number among the arguments.
 - `MIN(number1, number2, ..., numberN)`: Returns the minimum number among the arguments.
-- `SUM(list)`: adds up all items in the list if they are of the same base type. Cancatenates if all items are strings, adds numerically if all are numbers and returns the result. Raises an error for mixed types.
+- `SUM(list)`: adds up all items in the list if they are of the same base type. Concatenates if all items are strings, adds numerically if all are numbers and returns the result. Raises an error for mixed types.
 - `LENGTH(object)`/`LEN(object)`: Returns the count of items in a list of characters in a string, integer, or decimal.
 - `APPEND(list, item)`: Appends an item of any type to the end of a list and returns the adjusted list.
-- `UPDATE(kvs/list, string[key for kvs]/integer[index for list], value)`: Updates a KVS or List with a new value. In lists, it raises an error if the speicified index does not exist, otherwise, changes the value at specified index (supports negative indexing). In KVS, it sets the value for the specified key regardless of the current existence of that key.
+- `UPDATE(kvs/list, string[key for kvs]/integer[index for list], value)`: Updates a KVS or List with a new value. In lists, it raises an error if the specified index does not exist, otherwise, changes the value at specified index (supports negative indexing). In KVS, it sets the value for the specified key regardless of the current existence of that key.
 - `REMOVE_ITEM(list/kvs, item, max_occurences=unlimited)`: Removes an item from a list or kvs, with an optional third argument to specify the maximum number of occurrences to remove. If not specified, it removes all occurrences. If `max_occurrences` is set to 1, it only removes the first occurrence. It ultimately returns the adjusted list/kvs.
 - `REMOVE(list/kvs, index[for list]/key[for kvs])`: Removes an item from a list/kvs by index/key (supports negative indexing) and returns the adjusted list/kvs. Raises an error if the index does not exist. Does not raise an error if a key does not exist.
 - `ACCESS(list/kvs, index[for list]/key[for kvs], [optional default value for kvs access])`: Returns an item from a list/kvs by index/keu (supports negative indexing). Raises an error if the index does not exist. Returns null if the key does not exist or the default value if specified in the third argument.
-- `IF(condition1, result1, ..., conditionN, resultN, [else_result])`: Takes a minimum of two arguments up to an unlimited amount. Treats all arguments as condition result pairs if an even number of arguments are passes. If an odd number of arguments are passes, all but the last are treated as condition-result pairs, with the last argument being the `else` result. Returns the result corresponding to the first true condition, or the `else` result if none are met. Conditions are evaluated for truthiness, and no condition or result is evaluated until needed, ensuring that errors in non-relavant conditions or results do not affect the evaluation.
+- `IF(condition1, result1, ..., conditionN, resultN, [else_result])`: Takes a minimum of two arguments up to an unlimited amount. Treats all arguments as condition result pairs if an even number of arguments are passes. If an odd number of arguments are passes, all but the last are treated as condition-result pairs, with the last argument being the `else` result. Returns the result corresponding to the first true condition, or the `else` result if none are met. Conditions are evaluated for truthiness, and no condition or result is evaluated until needed, ensuring that errors in non-relevant conditions or results do not affect the evaluation.
 
 
 ### Examples
 #### Consistency Across Implementations:
 Expressions evaluated in `OQS` should yield identical results across different implementations. This consistency is vital, except in cases where custom features or extensions have been introduced. The following are sample expressions and their expected outputs:
-- **Numberical Operations**:
+- **Numerical Operations**:
   - **Input**: `2 * 5` **Output**: `10`
   - **Input**: `10 / 2` **Output**: `5`
   - **Input**: `9 % 2` **Output**: `1`
