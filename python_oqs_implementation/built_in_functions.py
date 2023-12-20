@@ -190,29 +190,125 @@ def bif_sum(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     return sum(lst)
 
 
-def bif_length(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+def bif_length(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) != 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
+        )
+    value: any = interpreter.evaluate(node.args[0])
+    if not isinstance(value, (str, list, dict)):
+        raise OQSTypeError(message="Argument must be a string, list or KVS")
+    return len(value)
 
 
-def bif_append(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+def bif_append(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
+    if len(node.args) != 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
+        )
+    lst, item = [interpreter.evaluate(arg) for arg in node.args]
+    if not isinstance(lst, list):
+        raise OQSTypeError(message="First argument must be a list")
+    lst.append(item)
+    return lst
 
 
-def bif_update(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+def bif_update(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any] | dict[str, any]:
+    if len(node.args) != 3:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=3, actual=len(node.args)
+        )
+    container, key_or_index, value = [interpreter.evaluate(arg) for arg in node.args]
+    if isinstance(container, list):
+        if not isinstance(key_or_index, int):
+            raise OQSTypeError(message="Index must be an integer")
+        key_or_index: int = key_or_index % len(container)
+        if key_or_index < 0 or key_or_index >= len(container):
+            raise IndexError("List index out of range")
+        container[key_or_index] = value
+    elif isinstance(container, dict):
+        if not isinstance(key_or_index, str):
+            raise OQSTypeError(message="Key must be a string")
+        container[key_or_index] = value
+    else:
+        raise OQSTypeError(message="First argument must be a list or KVS")
+    return container
 
 
-def bif_remove_item(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+def bif_remove_item(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any] | dict[str, any]:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=3, actual=len(node.args)
+        )
+    container, item = [interpreter.evaluate(arg) for arg in node.args[:2]]
+    max_occurrences: int = interpreter.evaluate(node.args[2]) if len(node.args) == 3 else MAX_ARGS
+    if not isinstance(max_occurrences, int):
+        raise OQSTypeError(message="Third argument must be an Integer")
+    if isinstance(container, list):
+        new_list: list[str, any] = []
+        for elem in container:
+            if elem == item and max_occurrences > 0:
+                max_occurrences -= 1
+                continue
+            new_list.append(elem)
+        return new_list
+    elif isinstance(container, dict):
+        if item in container:
+            del container[item]
+        return container
+    else:
+        raise OQSTypeError(message="First argument must be a list or KVS")
 
 
-def bif_remove(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+def bif_remove(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any] | dict[str, any]:
+    if len(node.args) != 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
+        )
+    container, key_or_index = [interpreter.evaluate(arg) for arg in node.args]
+    if isinstance(container, list):
+        if not isinstance(key_or_index, int):
+            raise OQSTypeError(message="Index must be an integer")
+        if key_or_index < 0 or key_or_index >= len(container):
+            raise IndexError("List index out of range")
+        del container[key_or_index]
+    elif isinstance(container, dict):
+        if not isinstance(key_or_index, str):
+            raise OQSTypeError(message="Key must be a string")
+        container.pop(key_or_index, None)
+    else:
+        raise OQSTypeError(message="First argument must be a list or KVS")
+    return container
 
 
 def bif_access(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=3, actual=len(node.args)
+        )
+    container, key_or_index = [interpreter.evaluate(arg) for arg in node.args[:2]]
+    default_value = interpreter.evaluate(node.args[2]) if len(node.args) == 3 else None
+    if isinstance(container, list):
+        if not isinstance(key_or_index, int):
+            raise OQSTypeError(message="Index must be an integer")
+        if key_or_index < 0 or key_or_index >= len(container):
+            raise IndexError("List index out of range")
+        return container[key_or_index]
+    elif isinstance(container, dict):
+        return container.get(key_or_index, default_value)
+    else:
+        raise OQSTypeError(message="First argument must be a list or KVS")
 
 
-def bif_if(interpreter: 'OQSInterpreter', node: FunctionNode):
-    pass
+def bif_if(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    for i in range(0, len(node.args) - 1, 2):
+        condition: any = interpreter.evaluate(node.args[i])
+        if condition:
+            return interpreter.evaluate(node.args[i + 1])
+    if len(node.args) % 2 != 0:
+        return interpreter.evaluate(node.args[-1])
+    return None
