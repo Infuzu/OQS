@@ -90,7 +90,6 @@ class OQSParser:
             if current_token:
                 tokens.append(''.join(current_token))
             tokens: list[str] = [token.strip() for token in tokens]
-            print(tokens)
             return tokens
         except Exception as e:
             raise OQSSyntaxError(f"Invalid syntax: {str(e)}")

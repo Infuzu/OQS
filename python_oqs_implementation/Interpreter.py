@@ -23,18 +23,13 @@ from .parser import OQSParser
 class OQSInterpreter:
     def __init__(self) -> None:
         self.variables: dict[str, any] = {}
-        self.operators: dict[str, Callable] = {
-            '+': built_in_functions.bif_add,
-            '-': built_in_functions.bif_subtract,
-            '*': built_in_functions.bif_multiply,
-            '/': built_in_functions.bif_divide,
-            '%': built_in_functions.bif_modulo,
-            '**': built_in_functions.bif_exponentiate
+        self.operators: dict[str, str] = {
+            '+': "ADD", '-': "SUBTRACT", '*': "MULTIPLY", '/': "DIVIDE", '%': "MODULO", '**': "EXPONENTIATE"
         }
         self.functions: dict[str, Callable] = {
             "ADD": built_in_functions.bif_add,
             "SUBTRACT": built_in_functions.bif_subtract,
-            "MULTIPLE": built_in_functions.bif_multiply,
+            "MULTIPLY": built_in_functions.bif_multiply,
             "DIVIDE": built_in_functions.bif_divide,
             "EXPONENTIATE": built_in_functions.bif_exponentiate,
             "MODULO": built_in_functions.bif_modulo,
@@ -77,10 +72,9 @@ class OQSInterpreter:
             else:
                 raise OQSUndefinedVariableError(node.name)
         elif isinstance(node, BinaryOpNode):
-            left: any = self.evaluate(node.left)
-            right: any = self.evaluate(node.right)
             if node.op in self.operators:
-                return self.operators[node.op](left, right)
+                function_node: FunctionNode = FunctionNode(name=self.operators[node.op], args=[node.right, node.left])
+                return self.functions[function_node.name](self, function_node)
             else:
                 raise OQSSyntaxError(f"Invalid binary operator '{node.op}'")
         elif isinstance(node, ComparisonOpNode):
