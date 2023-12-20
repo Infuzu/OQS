@@ -4,7 +4,7 @@ from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQ
 from .nodes import (FunctionNode, ASTNode)
 
 
-def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) < 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
@@ -13,7 +13,7 @@ def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode):
     return sum(evaluated_args)
 
 
-def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) != 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
@@ -22,7 +22,7 @@ def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode):
     return operator.sub(a, b)
 
 
-def bif_multiply(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_multiply(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) < 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
@@ -33,7 +33,7 @@ def bif_multiply(interpreter: 'OQSInterpreter', node: FunctionNode):
     return result
 
 
-def bif_divide(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_divide(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) != 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
@@ -44,7 +44,7 @@ def bif_divide(interpreter: 'OQSInterpreter', node: FunctionNode):
     return a / b
 
 
-def bif_exponentiate(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_exponentiate(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | complex:
     if len(node.args) != 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
@@ -53,7 +53,7 @@ def bif_exponentiate(interpreter: 'OQSInterpreter', node: FunctionNode):
     return pow(base, exponent)
 
 
-def bif_modulo(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_modulo(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
     if len(node.args) != 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
@@ -62,7 +62,7 @@ def bif_modulo(interpreter: 'OQSInterpreter', node: FunctionNode):
     return a % b
 
 
-def bif_integer(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_integer(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -71,7 +71,7 @@ def bif_integer(interpreter: 'OQSInterpreter', node: FunctionNode):
     return int(value)
 
 
-def bif_decimal(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_decimal(interpreter: 'OQSInterpreter', node: FunctionNode) -> float:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -80,7 +80,7 @@ def bif_decimal(interpreter: 'OQSInterpreter', node: FunctionNode):
     return float(value)
 
 
-def bif_string(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_string(interpreter: 'OQSInterpreter', node: FunctionNode) -> str:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -89,11 +89,11 @@ def bif_string(interpreter: 'OQSInterpreter', node: FunctionNode):
     return str(value)
 
 
-def bif_list(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_list(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
     return [interpreter.evaluate(arg) for arg in node.args]
 
 
-def bif_kvs(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_kvs(interpreter: 'OQSInterpreter', node: FunctionNode) -> dict[str, any]:
     if len(node.args) % 2 != 0:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
@@ -108,7 +108,7 @@ def bif_kvs(interpreter: 'OQSInterpreter', node: FunctionNode):
     return kvs
 
 
-def bif_boolean(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_boolean(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -117,7 +117,7 @@ def bif_boolean(interpreter: 'OQSInterpreter', node: FunctionNode):
     return bool(value)
 
 
-def bif_keys(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_keys(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[str]:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -128,7 +128,7 @@ def bif_keys(interpreter: 'OQSInterpreter', node: FunctionNode):
     return list(kvs.keys())
 
 
-def bif_values(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_values(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -139,7 +139,7 @@ def bif_values(interpreter: 'OQSInterpreter', node: FunctionNode):
     return list(kvs.values())
 
 
-def bif_unique(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_unique(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -150,7 +150,7 @@ def bif_unique(interpreter: 'OQSInterpreter', node: FunctionNode):
     return list(set(lst))
 
 
-def bif_reverse(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_reverse(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -161,7 +161,7 @@ def bif_reverse(interpreter: 'OQSInterpreter', node: FunctionNode):
     return lst[::-1]
 
 
-def bif_max(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_max(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) < 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
@@ -170,7 +170,7 @@ def bif_max(interpreter: 'OQSInterpreter', node: FunctionNode):
     return max(numbers)
 
 
-def bif_min(interpreter: 'OQSInterpreter', node: FunctionNode):
+def bif_min(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) < 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
@@ -179,8 +179,7 @@ def bif_min(interpreter: 'OQSInterpreter', node: FunctionNode):
     return min(numbers)
 
 
-def bif_sum(interpreter: 'OQSInterpreter', node: FunctionNode):
-
+def bif_sum(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
@@ -217,4 +216,3 @@ def bif_access(interpreter: 'OQSInterpreter', node: FunctionNode):
 
 def bif_if(interpreter: 'OQSInterpreter', node: FunctionNode):
     pass
-
