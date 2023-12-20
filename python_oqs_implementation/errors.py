@@ -43,3 +43,8 @@ class OQSFunctionEvaluationError(OQSBaseError):
     def __init__(self, function_name: str, message: str) -> None:
         full_message: str = f"Error in function '{function_name}': {message}"
         super().__init__(readable_name="Function Evaluation Error", message=full_message)
+
+
+class OQSDivisionByZeroError(OQSBaseError):
+    def __init__(self) -> None:
+        super().__init__(readable_name="Division By Zero Error", message="Division by zero results in undefined.")
