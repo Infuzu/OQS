@@ -32,8 +32,10 @@ def oqs_engine(
 
         return {"results": {"value": result, "type": oqs_type}}
     except OQSBaseError as e:
+        raise
         return {"error": {"type": e.readable_name, "message": str(e)}}
     except Exception as e:
+        raise
         return {
             "error": {
                 "type": "unknown", "message": "An unknown error occurred. Please reach out to our help team immediately"

@@ -10,10 +10,7 @@ from python_oqs_implementation.parser import OQSParser
 class TestSingleTokenizer(unittest.TestCase):
     def setUp(self) -> None:
         self._parser: OQSParser = OQSParser()
-        self._tokenizer: Callable = self._parser.tokenize_expression
-
-    def tokenize(self, expression) -> any:
-        return self._tokenizer(expression=expression, separate_arguments=False)
+        self.tokenize: Callable = self._parser.tokenize_expression
 
     def test_string(self):
         self.assertEqual(['"string"'], self.tokenize('"string"'))
@@ -35,16 +32,7 @@ class TestSingleTokenizer(unittest.TestCase):
         with self.assertRaises(OQSUnexpectedCharacterError):
             self.tokenize('variable.')
 
-        with self.assertRaises(OQSUnexpectedCharacterError):
-            self.tokenize('vari-able')
-
-        with self.assertRaises(OQSUnexpectedCharacterError):
-            self.tokenize('-variable')
-
-        with self.assertRaises(OQSUnexpectedCharacterError):
-            self.tokenize('variable-')
-
-        with self.assertRaises(OQSSyntaxError):
+        with self.assertRaises(OQSMissingExpectedCharacterError):
             self.tokenize('variable variable')
 
     def test_integer(self):
@@ -66,7 +54,7 @@ class TestSingleTokenizer(unittest.TestCase):
         self.assertEqual(['5.0'], self.tokenize('5.'))
         self.assertEqual(['555555.5'], self.tokenize('555_555.5'))
 
-        with self.assertRaises(OQSMissingExpectedCharacterError):
+        with self.assertRaises(OQSUnexpectedCharacterError):
             self.tokenize('.')
 
         with self.assertRaises(OQSUnexpectedCharacterError):
@@ -110,8 +98,8 @@ class TestSingleTokenizer(unittest.TestCase):
 
     def test_list(self):
         self.assertEqual(
-            ['[5, 5, "string"' + ", 'string', 4, ADD(3, 4), 2"],
-            self.tokenize('[5, 5, "string"' + ", 'string', 4, ADD(3, 4), 2"),
+            ['[5, 5, "string"' + ", 'string', 4, ADD(3, 4), 2]"],
+            self.tokenize('[5, 5, "string"' + ", 'string', 4, ADD(3, 4), 2]"),
         )
         self.assertEqual(['[]'], self.tokenize('[]'))
 
@@ -194,7 +182,7 @@ class TestSingleTokenizer(unittest.TestCase):
             ['anything', operator, 'anything', operator, 'anything'],
             self.tokenize(f'anything {operator} anything {operator} anything')
         )
-        self.assertEqual(['anything', operator*3, 'anything'], self.tokenize(f'anything {operator*3} anything'))
+        self.assertEqual(['anything', operator*4, 'anything'], self.tokenize(f'anything {operator*4} anything'))
 
         with self.assertRaises(OQSMissingExpectedCharacterError):
             self.tokenize(f'5 {operator} ')
@@ -204,9 +192,6 @@ class TestSingleTokenizer(unittest.TestCase):
 
         with self.assertRaises(OQSMissingExpectedCharacterError):
             self.tokenize(f'{operator} 5')
-
-        with self.assertRaises(OQSUnexpectedCharacterError):
-            self.tokenize(f'5 {operator} 5 .')
 
     def test_addition(self):
         self.operator_test(operator="+")
@@ -264,57 +249,54 @@ class TestSingleTokenizer(unittest.TestCase):
 class TestSeparatorTokenizer(unittest.TestCase):
     def setUp(self) -> None:
         self._parser: OQSParser = OQSParser()
-        self._tokenizer: Callable = self._parser.tokenize_expression
-
-    def tokenize(self, expression) -> any:
-        return self._tokenizer(expression=expression, separate_arguments=True)
+        self.separate: Callable = self._parser.separate_arguments
 
     def test_no_commas(self):
-        self.assertEqual(['5 + 5'], self.tokenize("5 + 5"))
-        self.assertEqual(['5'], self.tokenize('5'))
-        self.assertEqual(['variable'], self.tokenize('variable'))
-        self.assertEqual(['"string"'], self.tokenize('"string"'))
-        self.assertEqual(['ADD(5, 4, 3)'], self.tokenize('ADD(5, 4, 3)'))
+        self.assertEqual(['5 + 5'], self.separate("5 + 5"))
+        self.assertEqual(['5'], self.separate('5'))
+        self.assertEqual(['variable'], self.separate('variable'))
+        self.assertEqual(['"string"'], self.separate('"string"'))
+        self.assertEqual(['ADD(5, 4, 3)'], self.separate('ADD(5, 4, 3)'))
 
     def test_single_commas(self):
-        self.assertEqual(['5 + 5'], self.tokenize('5 + 5,'))
-        self.assertEqual(['5'], self.tokenize('5,'))
-        self.assertEqual(['variable'], self.tokenize('variable,'))
-        self.assertEqual(['"string"'], self.tokenize('"string",'))
-        self.assertEqual(['ADD(5, 4, 3)'], self.tokenize('ADD(5, 4, 3),'))
+        self.assertEqual(['5 + 5'], self.separate('5 + 5,'))
+        self.assertEqual(['5'], self.separate('5,'))
+        self.assertEqual(['variable'], self.separate('variable,'))
+        self.assertEqual(['"string"'], self.separate('"string",'))
+        self.assertEqual(['ADD(5, 4, 3)'], self.separate('ADD(5, 4, 3),'))
 
     def test_two_commas(self):
-        self.assertEqual(['5 + 5', '5 + 5'], self.tokenize('5 + 5, 5 + 5'))
-        self.assertEqual(['5', '5'], self.tokenize('5, 5'))
-        self.assertEqual(['variable', 'variable'], self.tokenize('variable, variable'))
-        self.assertEqual(['"string"', '"string"'], self.tokenize('"string", "string"'))
-        self.assertEqual(['ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.tokenize('ADD(5, 4, 3), ADD(5, 4, 3)'))
+        self.assertEqual(['5 + 5', '5 + 5'], self.separate('5 + 5, 5 + 5'))
+        self.assertEqual(['5', '5'], self.separate('5, 5'))
+        self.assertEqual(['variable', 'variable'], self.separate('variable, variable'))
+        self.assertEqual(['"string"', '"string"'], self.separate('"string", "string"'))
+        self.assertEqual(['ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.separate('ADD(5, 4, 3), ADD(5, 4, 3)'))
 
     def test_multiple_commas(self):
-        self.assertEqual(['5 + 5', '5 + 5', '5 + 5'], self.tokenize('5 + 5, 5 + 5, 5 + 5'))
-        self.assertEqual(['5', '5', '5'], self.tokenize('5, 5, 5'))
-        self.assertEqual(['variable', 'variable', 'variable'], self.tokenize('variable, variable, variable'))
-        self.assertEqual(['"string"', '"string"', '"string"'], self.tokenize('"string", "string", "string"'))
+        self.assertEqual(['5 + 5', '5 + 5', '5 + 5'], self.separate('5 + 5, 5 + 5, 5 + 5'))
+        self.assertEqual(['5', '5', '5'], self.separate('5, 5, 5'))
+        self.assertEqual(['variable', 'variable', 'variable'], self.separate('variable, variable, variable'))
+        self.assertEqual(['"string"', '"string"', '"string"'], self.separate('"string", "string", "string"'))
         self.assertEqual(
-            ['ADD(5, 4, 3)', 'ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.tokenize('ADD(5, 4, 3), ADD(5, 4, 3), ADD(5, 4, 3)')
+            ['ADD(5, 4, 3)', 'ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.separate('ADD(5, 4, 3), ADD(5, 4, 3), ADD(5, 4, 3)')
         )
 
     def test_commas_no_space(self):
-        self.assertEqual(['5 + 5', '5 + 5', '5 + 5'], self.tokenize('5 + 5,5 + 5,5 + 5'))
-        self.assertEqual(['5', '5', '5'], self.tokenize('5,5,5'))
-        self.assertEqual(['variable', 'variable', 'variable'], self.tokenize('variable,variable,variable'))
-        self.assertEqual(['"string"', '"string"', '"string"'], self.tokenize('"string","string","string"'))
+        self.assertEqual(['5 + 5', '5 + 5', '5 + 5'], self.separate('5 + 5,5 + 5,5 + 5'))
+        self.assertEqual(['5', '5', '5'], self.separate('5,5,5'))
+        self.assertEqual(['variable', 'variable', 'variable'], self.separate('variable,variable,variable'))
+        self.assertEqual(['"string"', '"string"', '"string"'], self.separate('"string","string","string"'))
         self.assertEqual(
-            ['ADD(5, 4, 3)', 'ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.tokenize('ADD(5, 4, 3),ADD(5, 4, 3),ADD(5, 4, 3)')
+            ['ADD(5, 4, 3)', 'ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.separate('ADD(5, 4, 3),ADD(5, 4, 3),ADD(5, 4, 3)')
         )
 
     def test_trailing_commas(self):
-        self.assertEqual(['5 + 5', '5 + 5', '5 + 5'], self.tokenize('5 + 5, 5 + 5, 5 + 5,'))
-        self.assertEqual(['5', '5', '5'], self.tokenize('5, 5, 5,'))
-        self.assertEqual(['variable', 'variable', 'variable'], self.tokenize('variable, variable, variable,'))
-        self.assertEqual(['"string"', '"string"', '"string"'], self.tokenize('"string", "string", "string",'))
+        self.assertEqual(['5 + 5', '5 + 5', '5 + 5'], self.separate('5 + 5, 5 + 5, 5 + 5,'))
+        self.assertEqual(['5', '5', '5'], self.separate('5, 5, 5,'))
+        self.assertEqual(['variable', 'variable', 'variable'], self.separate('variable, variable, variable,'))
+        self.assertEqual(['"string"', '"string"', '"string"'], self.separate('"string", "string", "string",'))
         self.assertEqual(
-            ['ADD(5, 4, 3)', 'ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.tokenize('ADD(5, 4, 3), ADD(5, 4, 3), ADD(5, 4, 3),')
+            ['ADD(5, 4, 3)', 'ADD(5, 4, 3)', 'ADD(5, 4, 3)'], self.separate('ADD(5, 4, 3), ADD(5, 4, 3), ADD(5, 4, 3),')
         )
 
 

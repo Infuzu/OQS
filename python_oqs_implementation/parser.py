@@ -20,110 +20,202 @@ class OQSParser:
         tokens: list[str] = self.tokenize_expression(expression=expression)
         return self.parse_expression(tokens=tokens)
 
-    def tokenize_expression(self, expression: str, separate_arguments: bool = False) -> list[str]:
+    @staticmethod
+    def tokenize_expression(expression: str) -> list[str]:
+        def char_is_operator(single_char_str: str) -> bool:
+            return single_char_str in ['+', '-', '*', '/', '%', '<', '>', '=', '!']
+
+        def token_is_operator(token: str) -> bool:
+            return char_is_operator(token[0]) and not (token.startswith('***') and len(token) > 3 and token[3] != '*')
+
+        def none_operator_char_is_valid_beginning_or_ending(single_char_str: str) -> bool:
+            return single_char_str in ['_', '(', ')', '[', ']', '{', '}', '"', "'"] or single_char_str.isalnum()
+
+        tokens: list[str] = []
+        expression: str = expression.strip()
+        i: int = 0
+        while i < len(expression):
+            char: str = expression[i]
+            if char in ['"', "'"]:
+                # String handling
+                start_index = i
+                i += 1
+                while i < len(expression) and expression[i] != char:
+                    i += 1
+                i += 1
+                tokens.append(expression[start_index:i])
+
+            elif char.isdigit() or (char == '.' and i + 1 < len(expression) and expression[i + 1].isdigit()):
+                # Decimal and integer handling
+                start_index = i
+                i += 1
+                while i < len(expression) and (expression[i].isdigit() or expression[i] in ['.', '_']):
+                    i += 1
+                number: str = expression[start_index:i]
+                if number.startswith('.'):
+                    number: str = '0' + number
+                if number.endswith('.'):
+                    number += '0'
+                if number.count('.') > 1:
+                    raise OQSUnexpectedCharacterError(message=f"A Decimal cannot contain more than one '.': {number}")
+                if '.' in number:
+                    split_number_list: list[str] = number.split('.')
+                    decimal_number: str = split_number_list[1]
+                    if '_' in decimal_number:
+                        raise OQSUnexpectedCharacterError(
+                            message=f"An underscore cannot be used to split a number after the decimal point: {number}"
+                        )
+                number: str = number.replace('_', '')
+                tokens.append(number)
+                if i < len(expression) and not (
+                        char_is_operator(expression[i]) or expression[i] in ['}', ']', ')', ' ']
+                ):
+                    raise OQSUnexpectedCharacterError(
+                        message=f"The character '{expression[i]}' is not expected after the number '{number}'. "
+                                f"It is suggested these be separated by a space or an operator."
+                    )
+
+            elif char.isalpha() or char == '_':
+                # Variable and function handling
+                start_index = i
+                i += 1
+                while i < len(expression) and (expression[i].isalnum() or expression[i] == '_'):
+                    i += 1
+                tokens.append(expression[start_index:i])
+
+            elif char_is_operator(char):
+                # Operator handling
+                start_index = i
+                while i + 1 < len(expression) and char_is_operator(expression[i + 1]):
+                    i += 1
+                i += 1
+                tokens.append(expression[start_index:i])
+
+            elif char in ['(', '[', '{']:
+                # Nested structures handling
+                closing_char = ')' if char == '(' else ']' if char == '[' else '}'
+                level = 1
+                start_index = i
+                i += 1
+                while i < len(expression) and level > 0:
+                    if expression[i] == char:
+                        level += 1
+                    elif expression[i] == closing_char:
+                        level -= 1
+                    i += 1
+                if level != 0:
+                    raise OQSMissingExpectedCharacterError(f"Unclosed '{char}' in expression: {expression}")
+                tokens.append(expression[start_index:i])
+            elif char == '*' and i + 2 < len(expression) and expression[i:i + 3] == '***' and (
+                    expression[i + 3] != '*' if i + 3 < len(expression) else True
+            ):
+                # Unpacking operator handling
+                tokens.append('***')
+                i += 3
+
+            elif char == ' ':
+                i += 1
+
+            else:
+                raise OQSUnexpectedCharacterError(
+                    message=f"The character '{char}' is not recognized in this setting: {expression}"
+                )
+
+        tokens: list[str] = [token.strip() for token in tokens if token.strip()]
+        tokens: list[str] = [
+            token + tokens[i + 1] if token == '***' and i + 1 < len(tokens) else token
+            for i, token in enumerate(tokens) if (tokens[i - 1] != '***' if i != 0 else True)
+        ]
+        tokens: list[str] = [
+            token + tokens[i + 1]
+            if (token[0].isalpha() or token[0] == '_') and i + 1 < len(tokens) and tokens[i + 1].startswith('(')
+            else token
+            for i, token in enumerate(tokens)
+            if (
+                not (token.startswith('(') and (tokens[i - 1][0].isalpha() or tokens[i - 1][0] == '_'))
+                if i != 0 else True
+            )
+        ]
+
+        for i, token in enumerate(tokens):
+            if token_is_operator(token):
+                if i == 0:
+                    raise OQSMissingExpectedCharacterError(
+                        message=f"There must be something preceding an operator: "
+                                f"There is nothing preceding the '{token}' operator."
+                    )
+                elif token_is_operator(tokens[i - 1]):
+                    raise OQSMissingExpectedCharacterError(
+                        message=f"Operators must be preceded by something other than an operator: "
+                                f"Your '{token}' operator is being preceded by '{tokens[i - 1]}' operator."
+                    )
+                if i == len(tokens) - 1:
+                    raise OQSMissingExpectedCharacterError(
+                        message=f"There must be something following an operator: "
+                                f"There is nothing following your '{token}' operator."
+                    )
+                elif token_is_operator(tokens[i + 1]):
+                    raise OQSMissingExpectedCharacterError(
+                        message=f"Operators must be followed by something other than an operator: "
+                                f"Your '{token}' operator is being followed by '{tokens[i + 1]}' operator."
+                    )
+            else:
+                if i > 0 and not token_is_operator(tokens[i - 1]):
+                    raise OQSMissingExpectedCharacterError(
+                        message=f"non-operators must be preceded by an operator: "
+                                f"Your non-operator '{token}' is being preceded by '{tokens[i - 1]}' non-operator."
+                    )
+                elif i + 1 < len(tokens) and not token_is_operator(tokens[i + 1]):
+                    raise OQSMissingExpectedCharacterError(
+                        message=f"non-operators must be followed by an operator: "
+                                f"Your non-operator '{token}' is being followed by '{tokens[i + 1]}'"
+                    )
+                elif not none_operator_char_is_valid_beginning_or_ending(token[0]) and not token.startswith('***'):
+                    raise OQSUnexpectedCharacterError(
+                        message=f"the character '{token[0]}' is not expected: {expression}."
+                    )
+                elif not none_operator_char_is_valid_beginning_or_ending(token[-1]):
+                    raise OQSUnexpectedCharacterError(
+                        message=f"the character '{token[-1]}' is not expected: {expression}."
+                    )
+                elif token.startswith('***') and len(token) > 3 and (
+                        not none_operator_char_is_valid_beginning_or_ending(
+                            token[3]
+                        ) or token[3].isdigit() or token[3] in ['"', "'"]
+                ):
+                    raise OQSUnexpectedCharacterError(
+                        message=f"Unexpected unpacking syntax as the provided item to unpack is invalid: {token}"
+                    )
+
+        return tokens
+
+    @staticmethod
+    def separate_arguments(expression: str) -> list[str]:
         tokens: list[str] = []
         expression: str = expression.strip()
         level: int = 0
         start_index: int = 0
         in_quote: bool = False
         quote_char: str = ''
-
-        if separate_arguments:
-            for i, char in enumerate(expression):
-                if char in ['"', "'"]:
-                    if in_quote and char == quote_char:
-                        in_quote: bool = False
-                    elif not in_quote:
-                        in_quote: bool = True
-                        quote_char: str = char
-                elif char in ['(', '{', '[']:
-                    if not in_quote:
-                        level += 1
-                elif char in [')', '}', ']']:
-                    if not in_quote:
-                        level -= 1
-                elif char == ',' and level == 0 and not in_quote:
-                    tokens.append(expression[start_index:i].strip())
-                    start_index: int = i + 1
-            tokens.append(expression[start_index:].strip())
-        else:
-            i: int = 0
-            while i < len(expression):
-                char: str = expression[i]
-                if char in ['"', "'"]:
-                    # String handling
-                    start_index = i
-                    i += 1
-                    while i < len(expression) and expression[i] != char:
-                        i += 1
-                    i += 1
-                    tokens.append(expression[start_index:i])
-
-                elif char.isdigit() or (char == '.' and i + 1 < len(expression) and expression[i + 1].isdigit()):
-                    # Decimal and integer handling
-                    start_index = i if char != '.' else i - 1  # Include preceding 0 for decimals like .5
-                    i += 1
-                    while i < len(expression) and (expression[i].isdigit() or expression[i] == '.'):
-                        i += 1
-                    tokens.append(expression[start_index:i])
-
-                elif char.isalpha() or char == '_':
-                    # Variable and function handling
-                    start_index = i
-                    i += 1
-                    while i < len(expression) and (expression[i].isalnum() or expression[i] == '_'):
-                        i += 1
-                    tokens.append(expression[start_index:i])
-
-                elif char in ['+', '-', '*', '/', '%', '<', '>', '=', '!', ',']:
-                    # Operator handling
-                    start_index = i
-                    while i + 1 < len(expression) and expression[i + 1] == char:
-                        i += 1
-                    i += 1
-                    tokens.append(expression[start_index:i])
-
-                elif char in ['(', '[', '{']:
-                    # Nested structures handling
-                    closing_char = ')' if char == '(' else ']' if char == '[' else '}'
-                    level = 1
-                    start_index = i
-                    i += 1
-                    while i < len(expression) and level > 0:
-                        if expression[i] == char:
-                            level += 1
-                        elif expression[i] == closing_char:
-                            level -= 1
-                        i += 1
-                    if level != 0:
-                        raise OQSSyntaxError(f"Unmatched '{char}' in expression")
-                    tokens.append(expression[start_index:i])
-
-                elif char == '*' and i + 2 < len(expression) and expression[i:i + 3] == '***':
-                    # Unpacking operator handling
-                    tokens.append('***')
-                    i += 3
-
-                else:
-                    i += 1
+        for i, char in enumerate(expression):
+            if char in ['"', "'"]:
+                if in_quote and char == quote_char:
+                    in_quote: bool = False
+                elif not in_quote:
+                    in_quote: bool = True
+                    quote_char: str = char
+            elif char in ['(', '{', '[']:
+                if not in_quote:
+                    level += 1
+            elif char in [')', '}', ']']:
+                if not in_quote:
+                    level -= 1
+            elif char == ',' and level == 0 and not in_quote:
+                tokens.append(expression[start_index:i].strip())
+                start_index: int = i + 1
+        tokens.append(expression[start_index:].strip())
 
         return [token.strip() for token in tokens if token.strip()]
-
-    @staticmethod
-    def find_closing(expression: str, start_index: int) -> int:
-        open_char: str = expression[start_index]
-        closing_char: str = ')' if open_char == '(' else ']' if open_char == '[' else '}'
-        level: int = 1
-        i: int = start_index + 1
-        while i < len(expression) and level > 0:
-            if expression[i] == open_char:
-                level += 1
-            elif expression[i] == closing_char:
-                level -= 1
-            i += 1
-        if level != 0:
-            raise OQSSyntaxError(f"Unmatched '{open_char}' in expression")
-        return i
 
     def parse_expression(self, tokens: list[str], pos: int = 0) -> ASTNode | type(None):
         left: ASTNode = self.parse_term(tokens=tokens, pos=pos)
@@ -147,7 +239,7 @@ class OQSParser:
                 else:
                     raise OQSSyntaxError("Unexpected end of expression after binary operator.")
             else:
-                raise OQSSyntaxError(f"Unexpected token: '{op}'")
+                raise OQSSyntaxError(f"Invalid Operator: '{op}'")
 
         return left
 
