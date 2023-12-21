@@ -71,12 +71,12 @@ Operators, which are foundational to the interaction between types, are clarifie
 
 
 ### Unpacking Syntax
-`OQS` includes an unpacking feature using the `*` notation. This allows for the expansion of list items directly into function arguments or for the creation of new lists.
-- In function calls, such as `INTEGER(*variable_1)` where `variable_1` contains `["1"]`, it will unpack the list and pass `"1"` as an argument to the `INTEGER` function, effectively calling `INTEGER("1")`.
-- For lists, the syntax `[*variable_1, *variable_2]` will combine the elements of `variable_1` and `variable_2` into a single list. For instance, if `variable_1 = [1, 2, 3]` and `variable_2 = [4, 5, 6]`, the result would be `[1, 2, 3, 4, 5, 6]`. This is functionally equivalent to using the `+` operator for list concatenation.
-`OQS` also includes unpacking KVS using the `**` notation. This allows for the expansion of KVS items directly into function arguments or for the creation of new KVSs.
-- In all standard cases such as `LIST(**variable_1)` where `variable_1` contains `{"hello": 5}`, it will unpack the kvs and pass `"hello"` and `5` as two arguments to the `LIST` function effectively calling `LIST("hello", 5)`.
-- For KVS creation, the syntax `{**kvs1, **kvs_2}` will combine the elements of `kvs1` and `kvs2` into a single KVS. For instance is `kvs1 = {"hello": 5}` and `kvs2 = {"yello": 3}`, the result would be `{"hello": 5, "yello": 3}`. This is functionally equivalent to using the `+` operator for KVS concatenation.
+`OQS` includes an unpacking feature using the `***` notation. This allows for the expansion of list items directly into function arguments or for the creation of new lists.
+- In function calls, such as `INTEGER(***variable_1)` where `variable_1` contains `["1"]`, it will unpack the list and pass `"1"` as an argument to the `INTEGER` function, effectively calling `INTEGER("1")`.
+- For lists, the syntax `[***variable_1, ***variable_2]` will combine the elements of `variable_1` and `variable_2` into a single list. For instance, if `variable_1 = [1, 2, 3]` and `variable_2 = [4, 5, 6]`, the result would be `[1, 2, 3, 4, 5, 6]`. This is functionally equivalent to using the `+` operator for list concatenation.
+`OQS` also includes unpacking KVS using the `***` notation. This allows for the expansion of KVS items directly into function arguments or for the creation of new KVSs.
+- In all standard cases such as `LIST(***variable_1)` where `variable_1` contains `{"hello": 5}`, it will unpack the kvs and pass `"hello"` and `5` as two arguments to the `LIST` function effectively calling `LIST("hello", 5)`.
+- For KVS creation, the syntax `{***kvs1, ***kvs_2}` will combine the elements of `kvs1` and `kvs2` into a single KVS. For instance is `kvs1 = {"hello": 5}` and `kvs2 = {"yello": 3}`, the result would be `{"hello": 5, "yello": 3}`. This is functionally equivalent to using the `+` operator for KVS concatenation.
 
 
 ### Type Interactions 

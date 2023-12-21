@@ -1,4 +1,4 @@
-from .errors import OQSSyntaxError
+from .errors import (OQSSyntaxError, OQSMissingExpectedCharacterError, OQSUnexpectedCharacterError, OQSBaseError)
 from .nodes import (
     ASTNode,
     BinaryOpNode,
@@ -20,79 +20,110 @@ class OQSParser:
         tokens: list[str] = self.tokenize_expression(expression=expression)
         return self.parse_expression(tokens=tokens)
 
-    @staticmethod
-    def tokenize_expression(expression: str) -> list[str]:
-        try:
-            tokens: list[str] = []
-            current_token: list[str] = []
-            level: int = 0
+    def tokenize_expression(self, expression: str, separate_arguments: bool = False) -> list[str]:
+        tokens: list[str] = []
+        expression: str = expression.strip()
+        level: int = 0
+        start_index: int = 0
+        in_quote: bool = False
+        quote_char: str = ''
+
+        if separate_arguments:
+            for i, char in enumerate(expression):
+                if char in ['"', "'"]:
+                    if in_quote and char == quote_char:
+                        in_quote: bool = False
+                    elif not in_quote:
+                        in_quote: bool = True
+                        quote_char: str = char
+                elif char in ['(', '{', '[']:
+                    if not in_quote:
+                        level += 1
+                elif char in [')', '}', ']']:
+                    if not in_quote:
+                        level -= 1
+                elif char == ',' and level == 0 and not in_quote:
+                    tokens.append(expression[start_index:i].strip())
+                    start_index: int = i + 1
+            tokens.append(expression[start_index:].strip())
+        else:
             i: int = 0
-            decimal_flag: bool = False
             while i < len(expression):
                 char: str = expression[i]
                 if char in ['"', "'"]:
-                    if current_token:
-                        tokens.append(''.join(current_token))
-                        current_token: list[str] = []
-                    string_char: str = char
-                    current_token.append(char)
+                    # String handling
+                    start_index = i
                     i += 1
-                    while i < len(expression) and expression[i] != string_char:
-                        current_token.append(expression[i])
+                    while i < len(expression) and expression[i] != char:
                         i += 1
-                    if i < len(expression):
-                        current_token.append(expression[i])
                     i += 1
-                elif char in ['(', '{', '[']:
-                    if current_token:
-                        tokens.append(''.join(current_token))
-                        current_token: list[str] = []
-                    level += 1
-                    current_token.append(char)
+                    tokens.append(expression[start_index:i])
+
+                elif char.isdigit() or (char == '.' and i + 1 < len(expression) and expression[i + 1].isdigit()):
+                    # Decimal and integer handling
+                    start_index = i if char != '.' else i - 1  # Include preceding 0 for decimals like .5
                     i += 1
-                elif char in [')', '}', ']']:
-                    if current_token:
-                        tokens.append(''.join(current_token))
-                        current_token: list[str] = []
-                    level -= 1
-                    current_token.append(char)
+                    while i < len(expression) and (expression[i].isdigit() or expression[i] == '.'):
+                        i += 1
+                    tokens.append(expression[start_index:i])
+
+                elif char.isalpha() or char == '_':
+                    # Variable and function handling
+                    start_index = i
                     i += 1
-                    if level == 0:
-                        tokens.append(''.join(current_token))
-                        current_token: list[str] = []
-                elif level == 0:
-                    if char.isdigit() or (char == '.' and not decimal_flag):
-                        if char == '.':
-                            decimal_flag: bool = True
-                        current_token.append(char)
-                    else:
-                        if current_token:
-                            tokens.append(''.join(current_token))
-                            current_token: list[str] = []
-                            decimal_flag: bool = False
-                        if char in ['+', '-', '*', '/', '%', '<', '>', '=', '!']:
-                            next_char: str = expression[i + 1] if i + 1 < len(expression) else ''
-                            next_next_char: str = expression[i + 2] if i + 2 < len(expression) else ''
-                            if char + next_char + next_next_char in ['===', '!==']:
-                                tokens.append(char + next_char + next_next_char)
-                                i += 2
-                            elif char + next_char in ['==', '!=', '<=', '>=', '**']:
-                                tokens.append(char + next_char)
-                                i += 1
-                            else:
-                                tokens.append(char)
-                        elif char not in [',', ' ']:
-                            tokens.append(char)
+                    while i < len(expression) and (expression[i].isalnum() or expression[i] == '_'):
+                        i += 1
+                    tokens.append(expression[start_index:i])
+
+                elif char in ['+', '-', '*', '/', '%', '<', '>', '=', '!', ',']:
+                    # Operator handling
+                    start_index = i
+                    while i + 1 < len(expression) and expression[i + 1] == char:
+                        i += 1
                     i += 1
+                    tokens.append(expression[start_index:i])
+
+                elif char in ['(', '[', '{']:
+                    # Nested structures handling
+                    closing_char = ')' if char == '(' else ']' if char == '[' else '}'
+                    level = 1
+                    start_index = i
+                    i += 1
+                    while i < len(expression) and level > 0:
+                        if expression[i] == char:
+                            level += 1
+                        elif expression[i] == closing_char:
+                            level -= 1
+                        i += 1
+                    if level != 0:
+                        raise OQSSyntaxError(f"Unmatched '{char}' in expression")
+                    tokens.append(expression[start_index:i])
+
+                elif char == '*' and i + 2 < len(expression) and expression[i:i + 3] == '***':
+                    # Unpacking operator handling
+                    tokens.append('***')
+                    i += 3
+
                 else:
-                    current_token.append(char)
                     i += 1
-            if current_token:
-                tokens.append(''.join(current_token))
-            tokens: list[str] = [token.strip() for token in tokens]
-            return tokens
-        except Exception as e:
-            raise OQSSyntaxError(f"Invalid syntax: {str(e)}")
+
+        return [token.strip() for token in tokens if token.strip()]
+
+    @staticmethod
+    def find_closing(expression: str, start_index: int) -> int:
+        open_char: str = expression[start_index]
+        closing_char: str = ')' if open_char == '(' else ']' if open_char == '[' else '}'
+        level: int = 1
+        i: int = start_index + 1
+        while i < len(expression) and level > 0:
+            if expression[i] == open_char:
+                level += 1
+            elif expression[i] == closing_char:
+                level -= 1
+            i += 1
+        if level != 0:
+            raise OQSSyntaxError(f"Unmatched '{open_char}' in expression")
+        return i
 
     def parse_expression(self, tokens: list[str], pos: int = 0) -> ASTNode | type(None):
         left: ASTNode = self.parse_term(tokens=tokens, pos=pos)

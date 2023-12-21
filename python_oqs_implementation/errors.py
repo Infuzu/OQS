@@ -18,8 +18,8 @@ class OQSInvalidArgumentQuantityError(OQSBaseError):
 
 
 class OQSSyntaxError(OQSBaseError):
-    def __init__(self, message: str) -> None:
-        super().__init__(readable_name="Syntax Error", message=message)
+    def __init__(self, message: str, specific_name: str = "Syntax Error") -> None:
+        super().__init__(readable_name=specific_name, message=message)
 
 
 class OQSTypeError(OQSBaseError):
@@ -48,3 +48,13 @@ class OQSFunctionEvaluationError(OQSBaseError):
 class OQSDivisionByZeroError(OQSBaseError):
     def __init__(self) -> None:
         super().__init__(readable_name="Division By Zero Error", message="Division by zero results in undefined.")
+
+
+class OQSUnexpectedCharacterError(OQSSyntaxError):
+    def __init__(self, message: str) -> None:
+        super().__init__(specific_name="Unexpected Character Error", message=message)
+
+
+class OQSMissingExpectedCharacterError(OQSSyntaxError):
+    def __init__(self, message: str) -> None:
+        super().__init__(specific_name="Missing Expected Character Error", message=message)
