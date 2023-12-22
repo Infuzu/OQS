@@ -1,7 +1,5 @@
 import re
 from .interpreter import OQSInterpreter
-from .parser import OQSParser
-from .nodes import ASTNode
 from .errors import OQSBaseError
 from .utils import get_oqs_type
 
