@@ -1,4 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
+## Version: 0.1
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
