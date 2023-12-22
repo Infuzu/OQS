@@ -18,7 +18,8 @@ def oqs_engine(
                 )
                 return str(embedded_result["results"]["value"])
 
-            expression: str = re.sub(r'<\{(.*?)\}>', replace_embedded, expression)
+            result_expression: str = re.sub(r'<\{(.*?)\}>', replace_embedded, expression)
+            return {"results": {"value": result_expression, "type": "String"}}
 
         parser: OQSParser = OQSParser()
         ast: ASTNode = parser.parse(expression=expression)
