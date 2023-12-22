@@ -231,6 +231,8 @@ class OQSParser:
         return left
 
     def parse_term(self, tokens: list[str], pos: int) -> ASTNode:
+        if len(tokens) <= pos:
+            return NullNode()
         token: str = tokens[pos]
         try:
             return NumberNode(value=int(token))
