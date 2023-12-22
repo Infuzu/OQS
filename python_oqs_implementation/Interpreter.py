@@ -141,7 +141,7 @@ class OQSInterpreter:
             kvs: dict[str, any] = {}
             for key, value in node.key_value_store.items():
                 if isinstance(value, PackedNode):
-                    unpacked_node: any = self.evaluate(self.parser.parse_expression([value.expression], 0))
+                    unpacked_node: any = self.evaluate(self.parser.parse(value.expression))
                     if isinstance(unpacked_node, list):
                         unpacked_kvs: dict[str, any] = self.evaluate(
                             FunctionNode(name="UNPACKED_KVS", args=unpacked_node)
@@ -150,14 +150,14 @@ class OQSInterpreter:
                             kvs[unpacked_key] = unpacked_value
                     elif isinstance(unpacked_node, dict):
                         for unpacked_key, unpacked_value in unpacked_node.items():
-                            kvs[self.evaluate(unpacked_key)] = self.evaluate(unpacked_value)
+                            kvs[unpacked_key] = unpacked_value
                     else:
                         raise OQSTypeError(
                             message="Cannot unpack anything into a KVS construction other than a List or KVS."
                         )
                 else:
                     kvs[self.evaluate(key)] = self.evaluate(value)
-            return {self.evaluate(key): self.evaluate(value) for key, value in node.key_value_store.items()}
+            return kvs
         elif isinstance(node, BooleanNode):
             return node.value
         elif isinstance(node, UnevaluatedNode):

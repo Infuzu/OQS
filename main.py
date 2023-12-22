@@ -3,7 +3,7 @@ from python_oqs_implementation.engine import oqs_engine
 
 
 def main():
-    expression: str = 'ADD({ "a": 1 }, { "b": 2 })'
+    expression: str = '{***{"key1": "value1"}, ***{"key2": "value2"}}'
     variables: dict[str, any] = {}
     string_embedded: bool = False
     result: dict[str, any] = oqs_engine(expression=expression, variables=variables, string_embedded=string_embedded)
