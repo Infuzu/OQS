@@ -21,7 +21,7 @@ from .nodes import (
     BooleanNode,
     UnevaluatedNode,
     ComparisonOpNode,
-    PackedNode
+    PackedNode, EvaluatedNode
 )
 from .parser import OQSParser
 
@@ -74,7 +74,9 @@ class OQSInterpreter:
         return self.evaluate(self.parser.parse(*args, **kwargs))
 
     def evaluate(self, node: ASTNode) -> any:
-        if isinstance(node, NumberNode):
+        if isinstance(node, EvaluatedNode):
+            return node.value
+        elif isinstance(node, NumberNode):
             return node.value
         elif isinstance(node, StringNode):
             return node.value
@@ -131,10 +133,17 @@ class OQSInterpreter:
                     args: list[ASTNode] = []
                     for arg in node.args:
                         if isinstance(arg, PackedNode):
-                            evaluated_arg: any = self.parse_and_evaluate(arg.expression)
-                            if isinstance(evaluated_arg, list):
-                                # TODO improve this to not require parsing and stringify and parsing again
-                                args.extend([self.parser.parse(str(argument)) for argument in evaluated_arg])
+                            parsed_arg: ASTNode = self.parser.parse(arg.expression)
+                            if isinstance(parsed_arg, ListNode):
+                                args.extend(parsed_arg.elements)
+                            elif isinstance(parsed_arg, VariableNode):
+                                variable_value: any = self.evaluate(parsed_arg)
+                                if isinstance(variable_value, list):
+                                    args.extend([EvaluatedNode(part) for part in variable_value])
+                                else:
+                                    raise OQSTypeError(
+                                        message="Cannot unpack anything into a function call other than a List."
+                                    )
                             else:
                                 raise OQSTypeError(
                                     message="Cannot unpack anything into a function call other than a List."

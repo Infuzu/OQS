@@ -11,6 +11,11 @@ class UnevaluatedNode(ASTNode):
         self.token: str = token
 
 
+class EvaluatedNode(ASTNode):
+    def __init__(self, value: any) -> None:
+        self.value: any = value
+
+
 class BinaryOpNode(ASTNode):
     def __init__(self, left: any, op: str, right: any) -> None:
         self.left: any = left
