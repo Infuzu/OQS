@@ -21,13 +21,7 @@ def oqs_engine(
             result_expression: str = re.sub(r'<\{(.*?)\}>', replace_embedded, expression)
             return {"results": {"value": result_expression, "type": "String"}}
 
-        parser: OQSParser = OQSParser()
-        ast: ASTNode = parser.parse(expression=expression)
-
-        interpreter: OQSInterpreter = OQSInterpreter(parser=parser)
-        if variables:
-            interpreter.set_variables(variables)
-        result: any = interpreter.evaluate(ast)
+        result: any = OQSInterpreter(expression=expression, variables=variables).results()
 
         return {"results": {"value": result, "type": get_oqs_type(result)}}
     except OQSBaseError as e:

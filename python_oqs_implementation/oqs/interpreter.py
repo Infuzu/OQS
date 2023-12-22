@@ -61,9 +61,14 @@ class OQSInterpreter:
         "IF": built_in_functions.bif_if
     }
 
-    def __init__(self, parser: OQSParser) -> None:
-        self.parser: OQSParser = parser
-        self.variables: dict[str, any] = {}
+    def __init__(self, expression: str, variables: dict[str, any] | None = None) -> None:
+        self.original_expression: str = expression
+        self.parser: OQSParser = OQSParser()
+        self.original_ast: ASTNode = self.parser.parse(expression=self.original_expression)
+        self.variables: dict[str, any] = variables if variables else {}
+
+    def results(self) -> any:
+        return self.evaluate(self.original_ast)
 
     def parse_and_evaluate(self, *args, **kwargs) -> any:
         return self.evaluate(self.parser.parse(*args, **kwargs))
@@ -170,6 +175,3 @@ class OQSInterpreter:
             return self.parse_and_evaluate(node.token)
         else:
             raise OQSSyntaxError(f"Unable to parse the following: {node}")
-
-    def set_variables(self, variable_map: dict[str, any]) -> None:
-        self.variables: dict[str, any] = variable_map
