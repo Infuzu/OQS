@@ -27,13 +27,20 @@ def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | 
     return completion
 
 
-def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
+def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | list | str:
     if len(node.args) != 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
         )
     a, b = [interpreter.evaluate(arg) for arg in node.args]
-    return operator.sub(a, b)
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        return a - b
+    elif isinstance(a, list) and isinstance(b, list):
+        return [item for item in a if item not in b]
+    elif isinstance(a, str) and isinstance(b, str):
+        return a.replace(b, '')
+    else:
+        raise OQSTypeError(message=f"Cannot subtract '{get_oqs_type(completion)}' by '{get_oqs_type(evaluated_arg)}'")
 
 
 def bif_multiply(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
