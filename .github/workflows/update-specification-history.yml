@@ -2,8 +2,9 @@ name: Update Specification History
 
 on:
   push:
-    paths:
-      - 'oqs-specification.md'
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   update-history:
