@@ -19,6 +19,11 @@ jobs:
           VERSION_NUMBER=$(grep -oP '## Version: \K[\d.]*' oqs-specification.md)
           echo "::set-output name=VERSION_NUMBER::${VERSION_NUMBER}"
 
+      - name: Ensure specification history file exists
+        id: ensure-folder-exists
+        run: |
+          mkdir -p specification_history
+
       - name: Check if version file exists
         id: check-file
         run: |
