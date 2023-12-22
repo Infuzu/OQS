@@ -27,5 +27,4 @@ jobs:
         python -m pip install -r requirements.txt
     - name: Test with unittest
       run: |
-        cd python_oqs_implementation
         python -m unittest discover
