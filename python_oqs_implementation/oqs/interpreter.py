@@ -65,6 +65,9 @@ class OQSInterpreter:
         self.parser: OQSParser = parser
         self.variables: dict[str, any] = {}
 
+    def parse_and_evaluate(self, *args, **kwargs) -> any:
+        return self.evaluate(self.parser.parse(*args, **kwargs))
+
     def evaluate(self, node: ASTNode) -> any:
         if isinstance(node, NumberNode):
             return node.value
@@ -76,7 +79,7 @@ class OQSInterpreter:
             elements: list[any] = []
             for elem in node.elements:
                 if isinstance(elem, PackedNode):
-                    evaluated_elem: any = self.evaluate(self.parser.parse(elem.expression))
+                    evaluated_elem: any = self.parse_and_evaluate(elem.expression)
                     if isinstance(evaluated_elem, list):
                         elements.extend(evaluated_elem)
                     else:
@@ -123,8 +126,9 @@ class OQSInterpreter:
                     args: list[ASTNode] = []
                     for arg in node.args:
                         if isinstance(arg, PackedNode):
-                            evaluated_arg: any = self.evaluate(self.parser.parse(arg.expression))
+                            evaluated_arg: any = self.parse_and_evaluate(arg.expression)
                             if isinstance(evaluated_arg, list):
+                                # TODO improve this to not require parsing and stringify and parsing again
                                 args.extend([self.parser.parse(str(argument)) for argument in evaluated_arg])
                             else:
                                 raise OQSTypeError(
@@ -143,7 +147,7 @@ class OQSInterpreter:
             kvs: dict[str, any] = {}
             for key, value in node.key_value_store.items():
                 if isinstance(value, PackedNode):
-                    unpacked_node: any = self.evaluate(self.parser.parse(value.expression))
+                    unpacked_node: any = self.parse_and_evaluate(value.expression)
                     if isinstance(unpacked_node, list):
                         unpacked_kvs: dict[str, any] = self.evaluate(
                             FunctionNode(name="UNPACKED_KVS", args=unpacked_node)
@@ -163,7 +167,7 @@ class OQSInterpreter:
         elif isinstance(node, BooleanNode):
             return node.value
         elif isinstance(node, UnevaluatedNode):
-            return self.evaluate(self.parser.parse(node.token))
+            return self.parse_and_evaluate(node.token)
         else:
             raise OQSSyntaxError(f"Unable to parse the following: {node}")
 
