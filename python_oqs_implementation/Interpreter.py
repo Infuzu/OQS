@@ -85,7 +85,7 @@ class OQSInterpreter:
                 raise OQSUndefinedVariableError(node.name)
         elif isinstance(node, BinaryOpNode):
             if node.op in self.operators:
-                function_node: FunctionNode = FunctionNode(name=self.operators[node.op], args=[node.right, node.left])
+                function_node: FunctionNode = FunctionNode(name=self.operators[node.op], args=[node.left, node.right])
                 return self.functions[function_node.name](self, function_node)
             else:
                 raise OQSSyntaxError(f"Invalid binary operator '{node.op}'")
