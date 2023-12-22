@@ -1,5 +1,3 @@
-import uuid
-
 from .errors import (OQSSyntaxError, OQSMissingExpectedCharacterError, OQSUnexpectedCharacterError, OQSBaseError)
 from .nodes import (
     ASTNode,
@@ -13,7 +11,8 @@ from .nodes import (
     VariableNode,
     FunctionNode,
     UnevaluatedNode,
-    ComparisonOpNode, PackedNode
+    ComparisonOpNode,
+    PackedNode
 )
 
 
@@ -39,17 +38,14 @@ class OQSParser:
         while i < len(expression):
             char: str = expression[i]
             if char in ['"', "'"]:
-                # String handling
-                start_index = i
+                start_index: int = i
                 i += 1
                 while i < len(expression) and expression[i] != char:
                     i += 1
                 i += 1
                 tokens.append(expression[start_index:i])
-
             elif char.isdigit() or (char == '.' and i + 1 < len(expression) and expression[i + 1].isdigit()):
-                # Decimal and integer handling
-                start_index = i
+                start_index: int = i
                 i += 1
                 while i < len(expression) and (expression[i].isdigit() or expression[i] in ['.', '_']):
                     i += 1
@@ -76,28 +72,22 @@ class OQSParser:
                         message=f"The character '{expression[i]}' is not expected after the number '{number}'. "
                                 f"It is suggested these be separated by a space or an operator."
                     )
-
             elif char.isalpha() or char == '_':
-                # Variable and function handling
-                start_index = i
+                start_index: int = i
                 i += 1
                 while i < len(expression) and (expression[i].isalnum() or expression[i] == '_'):
                     i += 1
                 tokens.append(expression[start_index:i])
-
             elif char_is_operator(char):
-                # Operator handling
-                start_index = i
+                start_index: int = i
                 while i + 1 < len(expression) and char_is_operator(expression[i + 1]):
                     i += 1
                 i += 1
                 tokens.append(expression[start_index:i])
-
             elif char in ['(', '[', '{']:
-                # Nested structures handling
-                closing_char = ')' if char == '(' else ']' if char == '[' else '}'
-                level = 1
-                start_index = i
+                closing_char: str = ')' if char == '(' else ']' if char == '[' else '}'
+                level: int = 1
+                start_index: int = i
                 i += 1
                 while i < len(expression) and level > 0:
                     if expression[i] == char:
@@ -111,13 +101,10 @@ class OQSParser:
             elif char == '*' and i + 2 < len(expression) and expression[i:i + 3] == '***' and (
                     expression[i + 3] != '*' if i + 3 < len(expression) else True
             ):
-                # Unpacking operator handling
                 tokens.append('***')
                 i += 3
-
             elif char == ' ':
                 i += 1
-
             else:
                 raise OQSUnexpectedCharacterError(
                     message=f"The character '{char}' is not recognized in this setting: {expression}"
@@ -188,7 +175,6 @@ class OQSParser:
                     raise OQSUnexpectedCharacterError(
                         message=f"Unexpected unpacking syntax as the provided item to unpack is invalid: {token}"
                     )
-
         return tokens
 
     @staticmethod
@@ -242,7 +228,6 @@ class OQSParser:
                     raise OQSSyntaxError("Unexpected end of expression after binary operator.")
             else:
                 raise OQSSyntaxError(f"Invalid Operator: '{op}'")
-
         return left
 
     def parse_term(self, tokens: list[str], pos: int) -> ASTNode:
@@ -290,7 +275,6 @@ class OQSParser:
     def parse_kvs(self, kvs_str: str) -> dict[ASTNode, ASTNode]:
         kvs_tokens: list[str] = self.separate_arguments(expression=kvs_str)
         kvs: dict[ASTNode, ASTNode] = {}
-
         for i, token in enumerate(kvs_tokens):
             if token.startswith('***'):
                 key: str = f'"PACKED_TOKEN__{i}"'
@@ -298,7 +282,6 @@ class OQSParser:
             else:
                 key, value = self.split_key_value_pair(token)
             kvs[self.parse_expression([key], 0)] = self.parse_expression([value], 0)
-
         return kvs
 
     @staticmethod
@@ -307,7 +290,6 @@ class OQSParser:
         level: int = 0
         in_string: bool = False
         string_char: str = ''
-
         for i, char in enumerate(token):
             if char in ['"', "'"]:
                 if in_string and char == string_char:
@@ -322,11 +304,8 @@ class OQSParser:
                 level += 1
             elif char in ['}', '[', ')']:
                 level -= 1
-
         if colon_index == -1:
             raise OQSSyntaxError(F"Invalid KVS pair {token}")
-
         key: str = token[:colon_index].strip()
         value: str = token[colon_index + 1:].strip()
-
         return key, value

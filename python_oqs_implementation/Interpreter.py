@@ -161,7 +161,7 @@ class OQSInterpreter:
         elif isinstance(node, BooleanNode):
             return node.value
         elif isinstance(node, UnevaluatedNode):
-            return self.evaluate(self.parser.parse_expression([node.token], 0))
+            return self.evaluate(self.parser.parse(node.token))
         else:
             raise OQSSyntaxError(f"Unable to parse the following: {node}")
 
