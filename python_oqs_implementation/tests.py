@@ -344,6 +344,10 @@ class TestLanguageEngine(unittest.TestCase):
             {"results": {"value": "valid", "type": "String"}},
             oqs_engine(expression='IF(LEN("test") == 4, "valid", "invalid")')
         )
+        self.assertEqual(
+            {"results": {"value": 25, "type": "Integer"}},
+            oqs_engine(expression='ADd(length([5, 10, ***[4, 3, "HEllo:,"]]), 20)')
+        )
 
     def test_addition(self):
         self.assertEqual({"results": {"value": 3, "type": "Integer"}}, oqs_engine(expression="1 + 2"))
