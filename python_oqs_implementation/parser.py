@@ -253,6 +253,8 @@ class OQSParser:
         elif token.startswith('[') and token.endswith(']'):
             elements: list[ASTNode] = self.parse_list(args_str=token[1:-1])
             return ListNode(elements=elements)
+        elif token.startswith('(') and token.endswith(')'):
+            return self.parse(expression=token[1:-1])
         elif '(' in token and token.endswith(')'):
             return self.parse_function_call(token)
         elif token.startswith('***'):
