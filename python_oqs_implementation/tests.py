@@ -305,7 +305,7 @@ class TestLanguageEngine(unittest.TestCase):
         self.assertEqual({"results": {"value": 10, "type": "Integer"}}, oqs_engine(expression="2 * 5"))
 
     def test_divide(self):
-        self.assertEqual({"results": {"value": 5, "type": "Integer"}}, oqs_engine(expression="10 / 2"))
+        self.assertEqual({"results": {"value": 5, "type": "Decimal"}}, oqs_engine(expression="10 / 2"))
 
     def test_modulo(self):
         self.assertEqual({"results": {"value": 1, "type": "Integer"}}, oqs_engine(expression="9 % 2"))
