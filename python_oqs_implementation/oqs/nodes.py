@@ -6,7 +6,7 @@ class NullNode(ASTNode):
     pass
 
 
-class UnevaluatedNode(ASTNode):
+class UnparsedNode(ASTNode):
     def __init__(self, token: str) -> None:
         self.token: str = token
 

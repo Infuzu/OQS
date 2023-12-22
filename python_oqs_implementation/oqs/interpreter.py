@@ -19,9 +19,10 @@ from .nodes import (
     BinaryOpNode,
     KVSNode,
     BooleanNode,
-    UnevaluatedNode,
+    UnparsedNode,
     ComparisonOpNode,
-    PackedNode, EvaluatedNode
+    PackedNode,
+    EvaluatedNode
 )
 from .parser import OQSParser
 
@@ -180,7 +181,7 @@ class OQSInterpreter:
             return kvs
         elif isinstance(node, BooleanNode):
             return node.value
-        elif isinstance(node, UnevaluatedNode):
+        elif isinstance(node, UnparsedNode):
             return self.parse_and_evaluate(node.token)
         else:
             raise OQSSyntaxError(f"Unable to parse the following: {node}")

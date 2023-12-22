@@ -10,7 +10,7 @@ from .nodes import (
     ListNode,
     VariableNode,
     FunctionNode,
-    UnevaluatedNode,
+    UnparsedNode,
     ComparisonOpNode,
     PackedNode
 )
@@ -266,7 +266,8 @@ class OQSParser:
         function_name, args_str = token[:-1].split('(', 1)
         args_tokens: list[str] = self.separate_arguments(expression=args_str)
         args: list[ASTNode] = [
-            self.parse_term([arg], 0) if arg.startswith('***') else UnevaluatedNode(token=arg) for arg in args_tokens
+            self.parse_term([arg], 0)
+            if arg.startswith('***') else UnparsedNode(token=arg) for arg in args_tokens
         ]
         return FunctionNode(name=function_name, args=args)
 
