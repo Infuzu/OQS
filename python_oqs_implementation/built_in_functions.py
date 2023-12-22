@@ -1,16 +1,30 @@
 import operator
 from .constants import MAX_ARGS
 from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
-from .nodes import (FunctionNode, ASTNode)
+from .nodes import FunctionNode
+from .utils import get_oqs_type
 
 
-def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:
+def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | list | str | dict:
     if len(node.args) < 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
         )
-    evaluated_args: list[ASTNode] = [interpreter.evaluate(arg) for arg in node.args]
-    return sum(evaluated_args)
+    evaluated_args: list[any] = [interpreter.evaluate(arg) for arg in node.args]
+    completion: any = evaluated_args.pop(0)
+    for evaluated_arg in evaluated_args:
+        if isinstance(completion, (int, float)) and isinstance(evaluated_arg, (int, float)):
+            completion += evaluated_arg
+        elif isinstance(completion, list) and isinstance(evaluated_arg, list):
+            completion += evaluated_arg
+        elif isinstance(completion, str) and isinstance(evaluated_arg, str):
+            completion += evaluated_arg
+        elif isinstance(completion, dict) and isinstance(evaluated_arg, dict):
+            for key, value in evaluated_arg.items():
+                completion[key] = value
+        else:
+            raise OQSTypeError(message=f"Cannot add '{get_oqs_type(completion)}' and '{get_oqs_type(evaluated_arg)}'")
+    return completion
 
 
 def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:

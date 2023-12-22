@@ -3,7 +3,7 @@ from .Interpreter import OQSInterpreter
 from .parser import OQSParser
 from .nodes import ASTNode
 from .errors import OQSBaseError
-from .constants import OQS_TYPE_MAPPING
+from .utils import get_oqs_type
 
 
 def oqs_engine(
@@ -28,9 +28,7 @@ def oqs_engine(
             interpreter.set_variables(variables)
         result: any = interpreter.evaluate(ast)
 
-        oqs_type: str = OQS_TYPE_MAPPING.get(type(result), 'Unknown')
-
-        return {"results": {"value": result, "type": oqs_type}}
+        return {"results": {"value": result, "type": get_oqs_type(result)}}
     except OQSBaseError as e:
         raise
         return {"error": {"type": e.readable_name, "message": str(e)}}
