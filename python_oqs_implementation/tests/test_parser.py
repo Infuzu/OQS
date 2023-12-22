@@ -1,9 +1,9 @@
 import unittest
 from typing import Callable
-from python_oqs_implementation.errors import (
+from python_oqs_implementation.oqs.errors import (
     OQSSyntaxError, OQSUnexpectedCharacterError, OQSMissingExpectedCharacterError
 )
-from python_oqs_implementation.parser import OQSParser
+from python_oqs_implementation.oqs.parser import OQSParser
 
 
 class TestSingleTokenizer(unittest.TestCase):

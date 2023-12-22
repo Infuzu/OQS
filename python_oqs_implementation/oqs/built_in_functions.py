@@ -1,4 +1,3 @@
-import operator
 from .constants import MAX_ARGS
 from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
 from .nodes import FunctionNode

@@ -1,7 +1,11 @@
 from typing import Callable
 from . import built_in_functions
 from .errors import (
-    OQSUndefinedFunctionError, OQSBaseError, OQSFunctionEvaluationError, OQSUndefinedVariableError, OQSSyntaxError,
+    OQSUndefinedFunctionError,
+    OQSBaseError,
+    OQSFunctionEvaluationError,
+    OQSUndefinedVariableError,
+    OQSSyntaxError,
     OQSTypeError,
 )
 from .nodes import (
@@ -16,7 +20,8 @@ from .nodes import (
     KVSNode,
     BooleanNode,
     UnevaluatedNode,
-    ComparisonOpNode, PackedNode
+    ComparisonOpNode,
+    PackedNode
 )
 from .parser import OQSParser
 

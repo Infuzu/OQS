@@ -1,5 +1,5 @@
 import json
-from python_oqs_implementation.engine import oqs_engine
+from python_oqs_implementation.oqs.engine import oqs_engine
 
 
 def main():

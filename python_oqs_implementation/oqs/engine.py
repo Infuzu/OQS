@@ -1,5 +1,5 @@
 import re
-from .Interpreter import OQSInterpreter
+from .interpreter import OQSInterpreter
 from .parser import OQSParser
 from .nodes import ASTNode
 from .errors import OQSBaseError
