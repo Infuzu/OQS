@@ -191,8 +191,8 @@ Expressions evaluated in `OQS` should yield identical results across different i
   - **Input**: `ACCESS([1, 2, 3], 1)` **Output**: `2`
   - **Input**: `IF(1 > 0, "positive", "negative")` **Output**: `"positive"`
 - **Unpacking and KVS Expansion**:
-  - **Input**: `INTEGER(*["5"])` **Output**: `5`
-  - **Input**: `{**{"key1": "value1"}, **{"key2": "value2"}}` **Output**: `{ "key1": "value1", "key2": "value2" }`
+  - **Input**: `INTEGER(**["5"])` **Output**: `5`
+  - **Input**: `{***{"key1": "value1"}, ***{"key2": "value2"}}` **Output**: `{ "key1": "value1", "key2": "value2" }`
 - **String Embedded Expressions**:
   - **Input**: `<{3 + 5}> is the answer` with `string_embedded` set to `true` **Output**: `"8 is the answer"`
 - **Complex Nested Expressions**:

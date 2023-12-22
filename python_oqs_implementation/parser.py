@@ -1,3 +1,5 @@
+import uuid
+
 from .errors import (OQSSyntaxError, OQSMissingExpectedCharacterError, OQSUnexpectedCharacterError, OQSBaseError)
 from .nodes import (
     ASTNode,
@@ -11,7 +13,7 @@ from .nodes import (
     VariableNode,
     FunctionNode,
     UnevaluatedNode,
-    ComparisonOpNode
+    ComparisonOpNode, PackedNode
 )
 
 
@@ -266,27 +268,35 @@ class OQSParser:
             return ListNode(elements=elements)
         elif '(' in token and token.endswith(')'):
             return self.parse_function_call(token)
+        elif token.startswith('***'):
+            return PackedNode(expression=token.lstrip('***'))
         else:
             return VariableNode(name=token)
 
     def parse_function_call(self, token: str) -> FunctionNode:
         function_name, args_str = token[:-1].split('(', 1)
-        args_tokens: list[str] = self.tokenize_expression(expression=args_str)
-        args: list[ASTNode] = [UnevaluatedNode(token=arg) for arg in args_tokens]
+        args_tokens: list[str] = self.separate_arguments(expression=args_str)
+        args: list[ASTNode] = [
+            self.parse_term([arg], 0) if arg.startswith('***') else UnevaluatedNode(token=arg) for arg in args_tokens
+        ]
         return FunctionNode(name=function_name, args=args)
 
     def parse_list(self, args_str: str) -> list[ASTNode]:
         if not args_str.strip():
             return []
-        args_tokens: list[str] = self.tokenize_expression(expression=args_str)
+        args_tokens: list[str] = self.separate_arguments(expression=args_str)
         return [self.parse_expression(tokens=[token], pos=0) for token in args_tokens]
 
     def parse_kvs(self, kvs_str: str) -> dict[ASTNode, ASTNode]:
-        kvs_tokens: list[str] = self.tokenize_expression(expression=kvs_str)
+        kvs_tokens: list[str] = self.separate_arguments(expression=kvs_str)
         kvs: dict[ASTNode, ASTNode] = {}
 
-        for token in kvs_tokens:
-            key, value = self.split_key_value_pair(token)
+        for i, token in enumerate(kvs_tokens):
+            if token.startswith('***'):
+                key: str = f'"PACKED_TOKEN__{i}"'
+                value: str = token
+            else:
+                key, value = self.split_key_value_pair(token)
             kvs[self.parse_expression([key], 0)] = self.parse_expression([value], 0)
 
         return kvs

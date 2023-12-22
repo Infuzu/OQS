@@ -59,3 +59,8 @@ class FunctionNode(ASTNode):
     def __init__(self, name: str, args: list[any]) -> None:
         self.name: str = name
         self.args: list[any] = args
+
+
+class PackedNode(ASTNode):
+    def __init__(self, expression: str) -> None:
+        self.expression: str = expression

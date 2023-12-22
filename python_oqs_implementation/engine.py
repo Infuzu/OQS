@@ -23,7 +23,7 @@ def oqs_engine(
         parser: OQSParser = OQSParser()
         ast: ASTNode = parser.parse(expression=expression)
 
-        interpreter: OQSInterpreter = OQSInterpreter()
+        interpreter: OQSInterpreter = OQSInterpreter(parser=parser)
         if variables:
             interpreter.set_variables(variables)
         result: any = interpreter.evaluate(ast)

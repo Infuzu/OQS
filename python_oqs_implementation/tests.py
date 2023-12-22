@@ -401,15 +401,15 @@ class TestLanguageEngine(unittest.TestCase):
         )
 
     def test_complex_add_expression(self):
-        self.assertEqual({"results": {"value": 10, "type": "Integer"}}, oqs_engine(expression='ADD(*[1, 2, 3, 4])'))
+        self.assertEqual({"results": {"value": 10, "type": "Integer"}}, oqs_engine(expression='ADD(***[1, 2, 3, 4])'))
 
     def test_unpacked_integer(self):
-        self.assertEqual({"results": {"value": 5, "type": "Integer"}}, oqs_engine(expression='INTEGER(*["5"])'))
+        self.assertEqual({"results": {"value": 5, "type": "Integer"}}, oqs_engine(expression='INTEGER(***["5"])'))
 
     def test_kvs_expansion(self):
         self.assertEqual(
             {"results": {"value": {"key1": "value1", "key2": "value2"}, "type": "KVS"}},
-            oqs_engine(expression='{**{"key1": "value1"}, **{"key2": "value2"}}')
+            oqs_engine(expression='{***{"key1": "value1"}, ***{"key2": "value2"}}')
         )
 
     def test_string_embedded_expression(self):

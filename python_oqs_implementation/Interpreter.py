@@ -2,6 +2,7 @@ from typing import Callable
 from . import built_in_functions
 from .errors import (
     OQSUndefinedFunctionError, OQSBaseError, OQSFunctionEvaluationError, OQSUndefinedVariableError, OQSSyntaxError,
+    OQSTypeError,
 )
 from .nodes import (
     FunctionNode,
@@ -15,13 +16,14 @@ from .nodes import (
     KVSNode,
     BooleanNode,
     UnevaluatedNode,
-    ComparisonOpNode
+    ComparisonOpNode, PackedNode
 )
 from .parser import OQSParser
 
 
 class OQSInterpreter:
-    def __init__(self) -> None:
+    def __init__(self, parser: OQSParser) -> None:
+        self.parser: OQSParser = parser
         self.variables: dict[str, any] = {}
         self.operators: dict[str, str] = {
             '+': "ADD", '-': "SUBTRACT", '*': "MULTIPLY", '/': "DIVIDE", '%': "MODULO", '**': "EXPONENTIATE"
@@ -65,7 +67,17 @@ class OQSInterpreter:
         elif isinstance(node, NullNode):
             return None
         elif isinstance(node, ListNode):
-            return [self.evaluate(elem) for elem in node.elements]
+            elements: list[any] = []
+            for elem in node.elements:
+                if isinstance(elem, PackedNode):
+                    evaluated_elem: any = self.evaluate(self.parser.parse_expression([elem.expression], 0))
+                    if isinstance(evaluated_elem, list):
+                        elements.extend([self.evaluate(element) for element in evaluated_elem])
+                    else:
+                        raise OQSTypeError(message="Cannot unpack anything into a list construction other than a List.")
+                else:
+                    elements.append(self.evaluate(elem))
+            return elements
         elif isinstance(node, VariableNode):
             if node.name in self.variables:
                 return self.variables[node.name]
@@ -102,7 +114,23 @@ class OQSInterpreter:
         elif isinstance(node, FunctionNode):
             try:
                 if node.name.upper() in self.functions:
-                    return self.functions[node.name.upper()](self, node)
+                    args: list[ASTNode] = []
+                    for arg in node.args:
+                        if isinstance(arg, PackedNode):
+                            evaluated_arg: any = self.evaluate(
+                                self.parser.parse_expression([arg.expression], 0)
+                            )
+                            if isinstance(evaluated_arg, list):
+                                args.extend(
+                                    [self.parser.parse_expression([argument], pos=0) for argument in evaluated_arg]
+                                )
+                            else:
+                                raise OQSTypeError(
+                                    message="Cannot unpack anything into a function call other than a List."
+                                )
+                        else:
+                            args.append(arg)
+                    return self.functions[node.name.upper()](self, FunctionNode(name=node.name, args=args))
                 else:
                     raise OQSUndefinedFunctionError(function_name=node.name)
             except OQSBaseError:
@@ -110,11 +138,30 @@ class OQSInterpreter:
             except Exception as e:
                 raise OQSFunctionEvaluationError(function_name=node.name, message=str(e))
         elif isinstance(node, KVSNode):
+            kvs: dict[str, any] = {}
+            for key, value in node.key_value_store.items():
+                if isinstance(value, PackedNode):
+                    unpacked_node: any = self.evaluate(self.parser.parse_expression([value.expression], 0))
+                    if isinstance(unpacked_node, list):
+                        unpacked_kvs: dict[str, any] = self.evaluate(
+                            FunctionNode(name="UNPACKED_KVS", args=unpacked_node)
+                        )
+                        for unpacked_key, unpacked_value in unpacked_kvs.items():
+                            kvs[unpacked_key] = unpacked_value
+                    elif isinstance(unpacked_node, dict):
+                        for unpacked_key, unpacked_value in unpacked_node.items():
+                            kvs[self.evaluate(unpacked_key)] = self.evaluate(unpacked_value)
+                    else:
+                        raise OQSTypeError(
+                            message="Cannot unpack anything into a KVS construction other than a List or KVS."
+                        )
+                else:
+                    kvs[self.evaluate(key)] = self.evaluate(value)
             return {self.evaluate(key): self.evaluate(value) for key, value in node.key_value_store.items()}
         elif isinstance(node, BooleanNode):
             return node.value
         elif isinstance(node, UnevaluatedNode):
-            return self.evaluate(OQSParser().parse_expression([node.token], 0))
+            return self.evaluate(self.parser.parse_expression([node.token], 0))
         else:
             raise OQSSyntaxError(f"Unable to parse the following: {node}")
 
