@@ -1,4 +1,4 @@
-from .errors import (OQSSyntaxError, OQSMissingExpectedCharacterError, OQSUnexpectedCharacterError, OQSBaseError)
+from .errors import (OQSSyntaxError, OQSMissingExpectedCharacterError, OQSUnexpectedCharacterError)
 from .nodes import (
     ASTNode,
     BinaryOpNode,
