@@ -27,42 +27,43 @@ from .parser import OQSParser
 
 
 class OQSInterpreter:
+    OPERATORS: dict[str, str] = {
+        '+': "ADD", '-': "SUBTRACT", '*': "MULTIPLY", '/': "DIVIDE", '%': "MODULO", '**': "EXPONENTIATE"
+    }
+    FUNCTIONS: dict[str, Callable] = {
+        "ADD": built_in_functions.bif_add,
+        "SUBTRACT": built_in_functions.bif_subtract,
+        "MULTIPLY": built_in_functions.bif_multiply,
+        "DIVIDE": built_in_functions.bif_divide,
+        "EXPONENTIATE": built_in_functions.bif_exponentiate,
+        "MODULO": built_in_functions.bif_modulo,
+        "INTEGER": built_in_functions.bif_integer,
+        "DECIMAL": built_in_functions.bif_decimal,
+        "STRING": built_in_functions.bif_string,
+        "LIST": built_in_functions.bif_list,
+        "KVS": built_in_functions.bif_kvs,
+        "BOOLEAN": built_in_functions.bif_boolean,
+        "BOOL": built_in_functions.bif_boolean,
+        "KEYS": built_in_functions.bif_keys,
+        "VALUES": built_in_functions.bif_values,
+        "UNIQUE": built_in_functions.bif_unique,
+        "REVERSE": built_in_functions.bif_reverse,
+        "MAX": built_in_functions.bif_max,
+        "MIN": built_in_functions.bif_min,
+        "SUM": built_in_functions.bif_sum,
+        "LENGTH": built_in_functions.bif_length,
+        "LEN": built_in_functions.bif_length,
+        "APPEND": built_in_functions.bif_append,
+        "UPDATE": built_in_functions.bif_update,
+        "REMOVE_ITEM": built_in_functions.bif_remove_item,
+        "REMOVE": built_in_functions.bif_remove,
+        "ACCESS": built_in_functions.bif_access,
+        "IF": built_in_functions.bif_if
+    }
+
     def __init__(self, parser: OQSParser) -> None:
         self.parser: OQSParser = parser
         self.variables: dict[str, any] = {}
-        self.operators: dict[str, str] = {
-            '+': "ADD", '-': "SUBTRACT", '*': "MULTIPLY", '/': "DIVIDE", '%': "MODULO", '**': "EXPONENTIATE"
-        }
-        self.functions: dict[str, Callable] = {
-            "ADD": built_in_functions.bif_add,
-            "SUBTRACT": built_in_functions.bif_subtract,
-            "MULTIPLY": built_in_functions.bif_multiply,
-            "DIVIDE": built_in_functions.bif_divide,
-            "EXPONENTIATE": built_in_functions.bif_exponentiate,
-            "MODULO": built_in_functions.bif_modulo,
-            "INTEGER": built_in_functions.bif_integer,
-            "DECIMAL": built_in_functions.bif_decimal,
-            "STRING": built_in_functions.bif_string,
-            "LIST": built_in_functions.bif_list,
-            "KVS": built_in_functions.bif_kvs,
-            "BOOLEAN": built_in_functions.bif_boolean,
-            "BOOL": built_in_functions.bif_boolean,
-            "KEYS": built_in_functions.bif_keys,
-            "VALUES": built_in_functions.bif_values,
-            "UNIQUE": built_in_functions.bif_unique,
-            "REVERSE": built_in_functions.bif_reverse,
-            "MAX": built_in_functions.bif_max,
-            "MIN": built_in_functions.bif_min,
-            "SUM": built_in_functions.bif_sum,
-            "LENGTH": built_in_functions.bif_length,
-            "LEN": built_in_functions.bif_length,
-            "APPEND": built_in_functions.bif_append,
-            "UPDATE": built_in_functions.bif_update,
-            "REMOVE_ITEM": built_in_functions.bif_remove_item,
-            "REMOVE": built_in_functions.bif_remove,
-            "ACCESS": built_in_functions.bif_access,
-            "IF": built_in_functions.bif_if
-        }
 
     def evaluate(self, node: ASTNode) -> any:
         if isinstance(node, NumberNode):
@@ -89,9 +90,9 @@ class OQSInterpreter:
             else:
                 raise OQSUndefinedVariableError(node.name)
         elif isinstance(node, BinaryOpNode):
-            if node.op in self.operators:
-                function_node: FunctionNode = FunctionNode(name=self.operators[node.op], args=[node.left, node.right])
-                return self.functions[function_node.name](self, function_node)
+            if node.op in self.OPERATORS:
+                function_node: FunctionNode = FunctionNode(name=self.OPERATORS[node.op], args=[node.left, node.right])
+                return self.FUNCTIONS[function_node.name](self, function_node)
             else:
                 raise OQSSyntaxError(f"Invalid binary operator '{node.op}'")
         elif isinstance(node, ComparisonOpNode):
@@ -118,7 +119,7 @@ class OQSInterpreter:
                 raise OQSSyntaxError(f"Invalid comparison operator '{node.op}'")
         elif isinstance(node, FunctionNode):
             try:
-                if node.name.upper() in self.functions:
+                if node.name.upper() in self.FUNCTIONS:
                     args: list[ASTNode] = []
                     for arg in node.args:
                         if isinstance(arg, PackedNode):
@@ -131,7 +132,7 @@ class OQSInterpreter:
                                 )
                         else:
                             args.append(arg)
-                    return self.functions[node.name.upper()](self, FunctionNode(name=node.name, args=args))
+                    return self.FUNCTIONS[node.name.upper()](self, FunctionNode(name=node.name, args=args))
                 else:
                     raise OQSUndefinedFunctionError(function_name=node.name)
             except OQSBaseError:
