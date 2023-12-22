@@ -1,0 +1,43 @@
+name: Update Specification History
+
+on:
+  push:
+    paths:
+      - 'oqs-specification.md'
+
+jobs:
+  update-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Extract version number
+        id: get-version
+        run: |
+          VERSION_NUMBER=$(grep -oP '## Version: \K[\d.]*' oqs-specification.md)
+          echo "::set-output name=VERSION_NUMBER::${VERSION_NUMBER}"
+
+      - name: Check if version file exists
+        id: check-file
+        run: |
+          VERSION_FILE="specification_history/version_${{ steps.get-version.outputs.VERSION_NUMBER }}.md"
+          if [ -f "$VERSION_FILE" ]; then
+            echo "::set-output name=EXISTS::true"
+          else
+            echo "::set-output name=EXISTS::false"
+          fi
+
+      - name: Copy specification to history
+        if: steps.check-file.outputs.EXISTS == 'false'
+        run: |
+          cp oqs-specification.md "specification_history/version_${{ steps.get-version.outputs.VERSION_NUMBER }}.md"
+
+      - name: Commit and push if there is a new version
+        if: steps.check-file.outputs.EXISTS == 'false'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Add specification history for version ${{ steps.get-version.outputs.VERSION_NUMBER }}"
+          git push
