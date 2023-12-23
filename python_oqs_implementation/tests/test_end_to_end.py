@@ -3,165 +3,109 @@ from typing import Callable
 from python_oqs_implementation.oqs.engine import oqs_engine
 from python_oqs_implementation.oqs.constants.types import ErrorTypeStrings as ETS
 from python_oqs_implementation.oqs.utils.shortcuts import get_oqs_type
-from .utils import get_test_function_name
+from .utils import language_engine_expected_result
 
 
 class TestLanguageEngine(unittest.TestCase):
+    def setUp(self):
+        self.cases: dict[str, list[dict[str, any]]] = {}
+
+    def leer(self, *args, **kwargs) -> None:
+        language_engine_expected_result(self, *args, **kwargs)
+
     def test_multiply(self):
-        self.assertEqual({"results": {"value": 10, "type": "Integer"}}, oqs_engine(expression="2 * 5"))
+        self.leer("2 * 5", 10)
 
     def test_divide(self):
-        self.assertEqual({"results": {"value": 5, "type": "Decimal"}}, oqs_engine(expression="10 / 2"))
+        self.leer("10 / 2", 5.0)
 
     def test_modulo(self):
-        self.assertEqual({"results": {"value": 1, "type": "Integer"}}, oqs_engine(expression="9 % 2"))
+        self.leer("9 % 2", 1)
 
     def test_string_concatenation(self):
-        self.assertEqual(
-            {"results": {"value": "Hello World", "type": "String"}}, oqs_engine(expression='"Hello " + "World"')
-        )
+        self.leer('"Hello " + "World"', "Hello World")
 
     def test_string_repetition(self):
-        self.assertEqual(
-            {"results": {"value": "repeatrepeat", "type": "String"}}, oqs_engine(expression='"repeat" * 2')
-        )
+        self.leer('"repeat" * 2', "repeatrepeat")
 
     def test_boolean_comparison(self):
-        self.assertEqual({"results": {"value": False, "type": "Boolean"}}, oqs_engine(expression="true == false"))
-        self.assertEqual({"results": {"value": True, "type": "Boolean"}}, oqs_engine(expression="true != false"))
+        self.leer("true == false", False)
+        self.leer("true != false", True)
 
     def test_list_concatenation(self):
-        self.assertEqual({"results": {"value": [1, 2, 3, 4], "type": "List"}}, oqs_engine(expression="[1, 2] + [3, 4]"))
+        self.leer("[1, 2] + [3, 4]", [1, 2, 3, 4])
 
     def test_list_subtraction(self):
-        self.assertEqual({"results": {"value": [1, 2, 4], "type": "List"}}, oqs_engine(expression="[1, 2, 3, 4] - [3]"))
+        self.leer("[1, 2, 3, 4] - [3]", [1, 2, 4])
 
     def test_kvs_concatenation(self):
-        self.assertEqual(
-            {"results": {"value": {"a": 1, "b": 2, "c": 3}, "type": "KVS"}},
-            oqs_engine(expression='{ "a": 1, "b": 2 } + { "c": 3 }')
-        )
+        self.leer('{ "a": 1, "b": 2 } + { "c": 3 }', {"a": 1, "b": 2, "c": 3})
 
     def test_add_function(self):
-        self.assertEqual({"results": {"value": 3, "type": "Integer"}}, oqs_engine(expression="ADD(1, 2)"))
+        self.leer("ADD(1, 2)", 3)
 
     def test_complex_expression(self):
-        self.assertEqual(
-            {"results": {"value": "valid", "type": "String"}},
-            oqs_engine(expression='IF(LEN("test") == 4, "valid", "invalid")')
-        )
-        self.assertEqual(
-            {"results": {"value": 25, "type": "Integer"}},
-            oqs_engine(expression='ADd(length([5, 10, ***[4, 3, "HEllo:,"]]), 20)')
-        )
+        self.leer('IF(LEN("test") == 4, "valid", "invalid")', "valid")
+        self.leer('ADd(length([5, 10, ***[4, 3, "HEllo:,"]]), 20)', 25)
 
     def test_addition(self):
-        self.assertEqual({"results": {"value": 3, "type": "Integer"}}, oqs_engine(expression="1 + 2"))
+        self.leer("1 + 2", 3)
 
     def test_subtraction(self):
-        self.assertEqual({"results": {"value": 3, "type": "Integer"}}, oqs_engine(expression="5 - 2"))
+        self.leer("5 - 2", 3)
 
     def test_exponentiation(self):
-        self.assertEqual({"results": {"value": 8, "type": "Integer"}}, oqs_engine(expression="2 ** 3"))
+        self.leer("2 ** 3", 8)
 
     def test_string_subtraction(self):
-        self.assertEqual({"results": {"value": "re", "type": "String"}}, oqs_engine(expression='"remove" - "move"'))
+        self.leer('"remove" - "move"', "re")
 
     def test_list_add_function(self):
-        self.assertEqual(
-            {"results": {"value": [1, 2, 3, 4], "type": "List"}}, oqs_engine(expression='ADD([1, 2], [3, 4])')
-        )
+        self.leer('ADD([1, 2], [3, 4])', [1, 2, 3, 4])
 
     def test_kvs_add_function(self):
-        self.assertEqual(
-            {"results": {"value": {"a": 1, "b": 2}, "type": "KVS"}},
-            oqs_engine(expression='ADD({ "a": 1 }, { "b": 2 })')
-        )
+        self.leer('ADD({ "a": 1 }, { "b": 2 })', {"a": 1, "b": 2})
 
     def test_integer_function(self):
-        self.assertEqual({"results": {"value": 3, "type": "Integer"}}, oqs_engine(expression='INTEGER(3.5)'))
+        self.leer('INTEGER(3.5)', 3)
 
     def test_decimal_function(self):
-        self.assertEqual({"results": {"value": 42.0, "type": "Decimal"}}, oqs_engine(expression='DECIMAL("42")'))
+        self.leer('DECIMAL("42")', 42.0)
 
     def test_string_function(self):
-        self.assertEqual(
-            {"results": {"value": "[1, 2, 3]", "type": "String"}}, oqs_engine(expression='STRING([1, 2, 3])')
-        )
+        self.leer('STRING([1, 2, 3])', "[1, 2, 3]")
 
     def test_boolean_function(self):
-        self.assertEqual({"results": {"value": True, "type": "Boolean"}}, oqs_engine(expression='BOOLEAN(1)'))
+        self.leer('BOOLEAN(1)', True)
 
     def test_keys_function(self):
-        self.assertEqual(
-            {"results": {"value": ["name", "type"], "type": "List"}},
-            oqs_engine(expression='KEYS({ "name": "OQS", "type": "script" })')
-        )
+        self.leer('KEYS({ "name": "OQS", "type": "script" })', ["name", "type"])
 
     def test_values_function(self):
-        self.assertEqual(
-            {"results": {"value": ["OQS", "script"], "type": "List"}},
-            oqs_engine(expression='VALUES({ "name": "OQS", "type": "script" })')
-        )
+        self.leer('VALUES({ "name": "OQS", "type": "script" })', ["OQS", "script"])
 
     def test_complex_if_expression(self):
-        self.assertEqual(
-            {"results": {"value": "valid", "type": "String"}},
-            oqs_engine(expression='IF(LEN("test") == 4, "valid", "invalid")')
-        )
+        self.leer('IF(LEN("test") == 4, "valid", "invalid")', "valid")
 
     def test_complex_add_expression(self):
-        self.assertEqual({"results": {"value": 10, "type": "Integer"}}, oqs_engine(expression='ADD(***[1, 2, 3, 4])'))
+        self.leer('ADD(***[1, 2, 3, 4])', 10)
 
     def test_unpacked_integer(self):
-        self.assertEqual({"results": {"value": 5, "type": "Integer"}}, oqs_engine(expression='INTEGER(***["5"])'))
+        self.leer('INTEGER(***["5"])', 5)
 
     def test_kvs_expansion(self):
-        self.assertEqual(
-            {"results": {"value": {"key1": "value1", "key2": "value2"}, "type": "KVS"}},
-            oqs_engine(expression='{***{"key1": "value1"}, ***{"key2": "value2"}}')
-        )
+        self.leer('{***{"key1": "value1"}, ***{"key2": "value2"}}', {"key1": "value1", "key2": "value2"})
 
     def test_string_embedded_expression(self):
-        self.assertEqual(
-            {"results": {"value": "8 is the answer", "type": "String"}},
-            oqs_engine(expression='<{3 + 5}> is the answer', string_embedded=True)
-        )
+        self.leer('<{3 + 5}> is the answer', "8 is the answer", string_embedded=True)
 
 
 class TestLanguageEngineAdvanced(unittest.TestCase):
     def setUp(self):
-        self.leer: Callable = self.language_engine_expected_result
         self.cases: dict[str, list[dict[str, any]]] = {}
 
-    def language_engine_expected_result(
-            self,
-            expression: str,
-            expected_value: any = None,
-            expected_type: str = None,
-            variables: dict[str, any] | None = None,
-            string_embedded: bool = False,
-            expect_error: bool = False,
-            error_message: str = None,
-    ):
-        if expected_type is None:
-            expected_type: str = get_oqs_type(expected_value)
-        results: dict[str, any] = oqs_engine(
-            expression=expression, variables=variables, string_embedded=string_embedded
-        )
-        expected_results: dict[str, any] = {
-            "error": {"type": expected_type, "message": error_message}
-        } if expect_error else {"results": {"value": expected_value, "type": expected_type}}
-        function_name: str = get_test_function_name()
-        if function_name not in self.cases:
-            self.cases[function_name] = []
-        self.cases[function_name].append(
-            {
-                "input": {"expression": expression, "variables": variables, "string_embedded": string_embedded},
-                "output": expected_results
-            }
-        )
-        self.assertEqual(expected_results, results)
+    def leer(self, *args, **kwargs) -> None:
+        language_engine_expected_result(self, *args, **kwargs)
 
     def test_basic(self):
         self.leer("2 * 5 + 3", 13)
@@ -313,6 +257,5 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         )
 
     def test_complex_evaluation_involving_multiple_data_types(self):
-        self.leer('STRING(ADD(***[1, 2, 3], LEN("[1, 2, 3]")))', "9")
+        self.leer('STRING(ADD(***[1, 2, 3], LEN("[1, 2, 3]")))', "15")
         self.leer("SUM([1, 2, 3]) == STRING(6)", False)
-

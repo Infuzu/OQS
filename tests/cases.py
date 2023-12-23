@@ -2,7 +2,7 @@ import inspect
 import json
 from typing import Callable
 from unittest import TestCase
-from python_oqs_implementation.tests.test_end_to_end import TestLanguageEngineAdvanced
+from python_oqs_implementation.tests.test_end_to_end import (TestLanguageEngineAdvanced, TestLanguageEngine)
 
 
 def generate_tests_json() -> None:
@@ -20,7 +20,8 @@ def generate_tests_json() -> None:
         return test_data
 
     test_classes_data: dict[str, any] = {
-        "TestLanguageEngineAdvanced": generate_test_json(TestLanguageEngineAdvanced)
+        "TestLanguageEngineAdvanced": generate_test_json(TestLanguageEngineAdvanced),
+        "TestLanguageEngine": generate_test_json(TestLanguageEngine)
     }
 
     with open("tests.json", "w") as file:

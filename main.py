@@ -1,6 +1,6 @@
 import json
 from python_oqs_implementation.oqs.engine import oqs_engine
-from tests.test_cases import generate_tests_json
+from tests.cases import generate_tests_json
 
 
 def main():

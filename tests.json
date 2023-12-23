@@ -292,8 +292,21 @@
                 },
                 "output": {
                     "results": {
-                        "value": "9",
+                        "value": "15",
                         "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "SUM([1, 2, 3]) == STRING(6)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
                     }
                 }
             }
@@ -905,6 +918,484 @@
                     "results": {
                         "value": "true",
                         "type": "String"
+                    }
+                }
+            }
+        ]
+    },
+    "TestLanguageEngine": {
+        "test_add_function": [
+            {
+                "input": {
+                    "expression": "ADD(1, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 3,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_addition": [
+            {
+                "input": {
+                    "expression": "1 + 2",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 3,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_boolean_comparison": [
+            {
+                "input": {
+                    "expression": "true == false",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "true != false",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_boolean_function": [
+            {
+                "input": {
+                    "expression": "BOOLEAN(1)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_complex_add_expression": [
+            {
+                "input": {
+                    "expression": "ADD(***[1, 2, 3, 4])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 10,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_complex_expression": [
+            {
+                "input": {
+                    "expression": "IF(LEN(\"test\") == 4, \"valid\", \"invalid\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "valid",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "ADd(length([5, 10, ***[4, 3, \"HEllo:,\"]]), 20)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 25,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_complex_if_expression": [
+            {
+                "input": {
+                    "expression": "IF(LEN(\"test\") == 4, \"valid\", \"invalid\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "valid",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_decimal_function": [
+            {
+                "input": {
+                    "expression": "DECIMAL(\"42\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 42.0,
+                        "type": "Decimal"
+                    }
+                }
+            }
+        ],
+        "test_divide": [
+            {
+                "input": {
+                    "expression": "10 / 2",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 5.0,
+                        "type": "Decimal"
+                    }
+                }
+            }
+        ],
+        "test_exponentiation": [
+            {
+                "input": {
+                    "expression": "2 ** 3",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 8,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_integer_function": [
+            {
+                "input": {
+                    "expression": "INTEGER(3.5)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 3,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_keys_function": [
+            {
+                "input": {
+                    "expression": "KEYS({ \"name\": \"OQS\", \"type\": \"script\" })",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            "name",
+                            "type"
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_kvs_add_function": [
+            {
+                "input": {
+                    "expression": "ADD({ \"a\": 1 }, { \"b\": 2 })",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "a": 1,
+                            "b": 2
+                        },
+                        "type": "KVS"
+                    }
+                }
+            }
+        ],
+        "test_kvs_concatenation": [
+            {
+                "input": {
+                    "expression": "{ \"a\": 1, \"b\": 2 } + { \"c\": 3 }",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "a": 1,
+                            "b": 2,
+                            "c": 3
+                        },
+                        "type": "KVS"
+                    }
+                }
+            }
+        ],
+        "test_kvs_expansion": [
+            {
+                "input": {
+                    "expression": "{***{\"key1\": \"value1\"}, ***{\"key2\": \"value2\"}}",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "key1": "value1",
+                            "key2": "value2"
+                        },
+                        "type": "KVS"
+                    }
+                }
+            }
+        ],
+        "test_list_add_function": [
+            {
+                "input": {
+                    "expression": "ADD([1, 2], [3, 4])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_list_concatenation": [
+            {
+                "input": {
+                    "expression": "[1, 2] + [3, 4]",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_list_subtraction": [
+            {
+                "input": {
+                    "expression": "[1, 2, 3, 4] - [3]",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            4
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_modulo": [
+            {
+                "input": {
+                    "expression": "9 % 2",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 1,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_multiply": [
+            {
+                "input": {
+                    "expression": "2 * 5",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 10,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_string_concatenation": [
+            {
+                "input": {
+                    "expression": "\"Hello \" + \"World\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "Hello World",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_embedded_expression": [
+            {
+                "input": {
+                    "expression": "<{3 + 5}> is the answer",
+                    "variables": null,
+                    "string_embedded": true
+                },
+                "output": {
+                    "results": {
+                        "value": "8 is the answer",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_function": [
+            {
+                "input": {
+                    "expression": "STRING([1, 2, 3])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "[1, 2, 3]",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_repetition": [
+            {
+                "input": {
+                    "expression": "\"repeat\" * 2",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "repeatrepeat",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_subtraction": [
+            {
+                "input": {
+                    "expression": "\"remove\" - \"move\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "re",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_subtraction": [
+            {
+                "input": {
+                    "expression": "5 - 2",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 3,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_unpacked_integer": [
+            {
+                "input": {
+                    "expression": "INTEGER(***[\"5\"])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 5,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_values_function": [
+            {
+                "input": {
+                    "expression": "VALUES({ \"name\": \"OQS\", \"type\": \"script\" })",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            "OQS",
+                            "script"
+                        ],
+                        "type": "List"
                     }
                 }
             }
