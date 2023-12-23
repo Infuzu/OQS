@@ -1,3 +1,5 @@
+import json
+
 from python_oqs_implementation.oqs.constants.values import MAX_ARGS
 from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
 from .nodes import FunctionNode
@@ -109,7 +111,7 @@ def bif_string(interpreter: 'OQSInterpreter', node: FunctionNode) -> str:
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
         )
     value: any = interpreter.evaluate(node.args[0])
-    return str(value)
+    return json.dumps(value)
 
 
 def bif_list(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
