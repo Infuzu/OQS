@@ -256,7 +256,7 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
     def test_advanced_function_calls_and_kvs_manipulations(self):
         self.leer("REMOVE_ITEM(UNIQUE(numbers), MIN(***numbers), 1)", [2, 3], variables={"numbers": [1, 2, 1, 3]})
         self.leer(
-            'UPDATE(kvs, "total", SUM(***VALUES(kvs)))',
+            'UPDATE(kvs, "total", SUM(VALUES(kvs)))',
             {"a": 1, "b": 2, "total": 3},
             variables={"kvs": {"a": 1, "b": 2}}
         )

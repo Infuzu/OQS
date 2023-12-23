@@ -26,11 +26,12 @@
             },
             {
                 "input": {
-                    "expression": "UPDATE(kvs, \"total\", SUM(***VALUES(kvs)))",
+                    "expression": "UPDATE(kvs, \"total\", SUM(VALUES(kvs)))",
                     "variables": {
                         "kvs": {
                             "a": 1,
-                            "b": 2
+                            "b": 2,
+                            "total": 3
                         }
                     },
                     "string_embedded": false
@@ -124,6 +125,45 @@
                             3
                         ],
                         "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "REMOVE_ITEM([1, 2, 3, 2, 3, 3], 3, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            2,
+                            3
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "UPDATE(kvs, \"newKey\", IF(ACCESS(kvs, \"key\") == 5, 10, 0))",
+                    "variables": {
+                        "kvs": {
+                            "key": 5,
+                            "newKey": 10
+                        }
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "key": 5,
+                            "newKey": 10
+                        },
+                        "type": "KVS"
                     }
                 }
             }

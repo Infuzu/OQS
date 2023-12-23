@@ -134,17 +134,9 @@ class OQSInterpreter:
                     args: list[ASTNode] = []
                     for arg in node.args:
                         if isinstance(arg, PackedNode):
-                            parsed_arg: ASTNode = self.parser.parse(arg.expression)
-                            if isinstance(parsed_arg, ListNode):
-                                args.extend(parsed_arg.elements)
-                            elif isinstance(parsed_arg, VariableNode):
-                                variable_value: any = self.evaluate(parsed_arg)
-                                if isinstance(variable_value, list):
-                                    args.extend([EvaluatedNode(part) for part in variable_value])
-                                else:
-                                    raise OQSTypeError(
-                                        message="Cannot unpack anything into a function call other than a List."
-                                    )
+                            parsed_value: any = self.parse_and_evaluate(arg.expression)
+                            if isinstance(parsed_value, list):
+                                args.extend([EvaluatedNode(part) for part in parsed_value])
                             else:
                                 raise OQSTypeError(
                                     message="Cannot unpack anything into a function call other than a List."
