@@ -5,7 +5,7 @@ from tests.cases import generate_tests_json
 
 def main():
     generate_tests_json()
-    expression: str = '5 + (5 + 5)'
+    expression: str = 'SUBTRACT([1, 2, 3], 1)'
     variables: dict[str, any] = {}
     string_embedded: bool = False
     result: dict[str, any] = oqs_engine(expression=expression, variables=variables, string_embedded=string_embedded)

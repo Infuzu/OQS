@@ -41,7 +41,7 @@ def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | flo
     elif isinstance(a, str) and isinstance(b, str):
         return a.replace(b, '')
     else:
-        raise OQSTypeError(message=f"Cannot subtract '{get_oqs_type(completion)}' by '{get_oqs_type(evaluated_arg)}'")
+        raise OQSTypeError(message=f"Cannot subtract '{get_oqs_type(a)}' by '{get_oqs_type(b)}'")
 
 
 def bif_multiply(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float:

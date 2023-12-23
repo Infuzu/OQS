@@ -920,6 +920,19 @@
                         "type": "String"
                     }
                 }
+            },
+            {
+                "input": {
+                    "expression": "IF(\"text\" - \"t\" == \"ex\", \"Correct\", \"Incorrect\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "Correct",
+                        "type": "String"
+                    }
+                }
             }
         ]
     },
