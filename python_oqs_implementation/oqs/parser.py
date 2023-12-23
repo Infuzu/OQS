@@ -255,10 +255,10 @@ class OQSParser:
             return ListNode(elements=elements)
         elif token.startswith('(') and token.endswith(')'):
             return self.parse(expression=token[1:-1])
-        elif '(' in token and token.endswith(')'):
-            return self.parse_function_call(token)
         elif token.startswith('***'):
             return PackedNode(expression=token.lstrip('***'))
+        elif '(' in token and token.endswith(')'):
+            return self.parse_function_call(token)
         else:
             return VariableNode(name=token)
 
