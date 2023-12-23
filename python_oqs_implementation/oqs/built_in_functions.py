@@ -1,7 +1,7 @@
-from .constants import MAX_ARGS
+from python_oqs_implementation.oqs.constants.values import MAX_ARGS
 from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
 from .nodes import FunctionNode
-from .utils import get_oqs_type
+from .utils.shortcuts import get_oqs_type
 
 
 def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | list | str | dict:
@@ -61,7 +61,10 @@ def bif_divide(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float
     a, b = [interpreter.evaluate(arg) for arg in node.args]
     if b == 0:
         raise OQSDivisionByZeroError()
-    return a / b
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        return a / b
+    else:
+        raise OQSTypeError(message=f"Cannot divide type '{get_oqs_type(a)}' by type '{get_oqs_type(b)}'.")
 
 
 def bif_exponentiate(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | complex:

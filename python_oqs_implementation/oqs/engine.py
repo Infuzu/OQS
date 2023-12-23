@@ -1,7 +1,7 @@
 import re
 from .interpreter import OQSInterpreter
 from .errors import OQSBaseError
-from .utils import get_oqs_type
+from .utils.shortcuts import get_oqs_type
 
 
 def oqs_engine(
