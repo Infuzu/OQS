@@ -1,8 +1,10 @@
 import json
 from python_oqs_implementation.oqs.engine import oqs_engine
+from tests.test_cases import generate_tests_json
 
 
 def main():
+    generate_tests_json()
     expression: str = '5 + (5 + 5)'
     variables: dict[str, any] = {}
     string_embedded: bool = False

@@ -1,9 +1,9 @@
 import unittest
 from typing import Callable
-
 from python_oqs_implementation.oqs.engine import oqs_engine
 from python_oqs_implementation.oqs.constants.types import ErrorTypeStrings as ETS
 from python_oqs_implementation.oqs.utils.shortcuts import get_oqs_type
+from .utils import get_test_function_name
 
 
 class TestLanguageEngine(unittest.TestCase):
@@ -132,6 +132,7 @@ class TestLanguageEngine(unittest.TestCase):
 class TestLanguageEngineAdvanced(unittest.TestCase):
     def setUp(self):
         self.leer: Callable = self.language_engine_expected_result
+        self.cases: dict[str, list[dict[str, any]]] = {}
 
     def language_engine_expected_result(
             self,
@@ -151,6 +152,15 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         expected_results: dict[str, any] = {
             "error": {"type": expected_type, "message": error_message}
         } if expect_error else {"results": {"value": expected_value, "type": expected_type}}
+        function_name: str = get_test_function_name()
+        if function_name not in self.cases:
+            self.cases[function_name] = []
+        self.cases[function_name].append(
+            {
+                "input": {"expression": expression, "variables": variables, "string_embedded": string_embedded},
+                "output": expected_results
+            }
+        )
         self.assertEqual(expected_results, results)
 
     def test_basic(self):

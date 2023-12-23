@@ -1,0 +1,913 @@
+{
+    "TestLanguageEngineAdvanced": {
+        "test_advanced_function_calls_and_kvs_manipulations": [
+            {
+                "input": {
+                    "expression": "REMOVE_ITEM(UNIQUE(numbers), MIN(***numbers), 1)",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            1,
+                            3
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            2,
+                            3
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "UPDATE(kvs, \"total\", SUM(***VALUES(kvs)))",
+                    "variables": {
+                        "kvs": {
+                            "a": 1,
+                            "b": 2
+                        }
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "a": 1,
+                            "b": 2,
+                            "total": 3
+                        },
+                        "type": "KVS"
+                    }
+                }
+            }
+        ],
+        "test_advanced_mathematical_operations": [
+            {
+                "input": {
+                    "expression": "MODULO(ADD(15, 5), DIVIDE(20, 2))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 0.0,
+                        "type": "Decimal"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "EXPONENTIATE(SUBTRACT(10, 2), 3)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 512,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_advanced_numerical_operations": [
+            {
+                "input": {
+                    "expression": "MODULO(15, 4) + DIVIDE(20, 5)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 7.0,
+                        "type": "Decimal"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "EXPONENTIATE(ADD(2, 3), SUBTRACT(5, 2))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 125,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_advanced_scenarios": [
+            {
+                "input": {
+                    "expression": "UNIQUE([***numbers, ***REVERSE(numbers)])",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            3
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_basic": [
+            {
+                "input": {
+                    "expression": "2 * 5 + 3",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 13,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "\"Hello \" + name",
+                    "variables": {
+                        "name": "World"
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "Hello World",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "ADD(1, 2, 3)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 6,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "SUBTRACT(10, LENGTH(name))",
+                    "variables": {
+                        "name": "OQS"
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 7,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "MULTIPLY(3, ***numbers)",
+                    "variables": {
+                        "numbers": [
+                            2,
+                            2
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 12,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "DECIMAL(STRING(number))",
+                    "variables": {
+                        "number": 123
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 123.0,
+                        "type": "Decimal"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "IF(LEN(text) > 5, \"Long\", \"Short\")",
+                    "variables": {
+                        "text": "Hello"
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "Short",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "{***kvs1, ***kvs2}",
+                    "variables": {
+                        "kvs1": {
+                            "a": 1
+                        },
+                        "kvs2": {
+                            "b": 2
+                        }
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "a": 1,
+                            "b": 2
+                        },
+                        "type": "KVS"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "SUM([1, 2, 3]) + SUM([4, 5, 6])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 21,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRING(ADD(1, 2, 3)) + \" is the sum\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "6 is the sum",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_complex_evaluation_involving_multiple_data_types": [
+            {
+                "input": {
+                    "expression": "STRING(ADD(***[1, 2, 3], LEN(\"[1, 2, 3]\")))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "9",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_complex_function_calls_and_list_manipulations": [
+            {
+                "input": {
+                    "expression": "REMOVE_ITEM([1, 2, 3, 4, 5], ADD(2, 1))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            4,
+                            5
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "APPEND(numbers, MULTIPLY(LENGTH(numbers), 2))",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            3,
+                            6
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            6
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_complex_list_operations": [
+            {
+                "input": {
+                    "expression": "REVERSE(APPEND(numbers, SUM(numbers)))",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            3,
+                            6
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            6,
+                            3,
+                            2,
+                            1
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_complex_nested_expressions": [
+            {
+                "input": {
+                    "expression": "IF(LEN(name) > 5, SUBTRACT(LEN(name), 3), ADD(LEN(name), 2))",
+                    "variables": {
+                        "name": "Scripting"
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 6,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRING(ADD(***[INTEGER(\"1\"), DECIMAL(\"2.5\"), 3]))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "6.5",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_complex_string_manipulation": [
+            {
+                "input": {
+                    "expression": "STRING(LEN(\"Hello\")) + \" characters\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "5 characters",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "\"Start-\" + MULTIPLY(\"A\", 3) + \"-End\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "Start-AAA-End",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_conditional_expressions_with_functions": [
+            {
+                "input": {
+                    "expression": "IF(LEN(name) < 5, LEN(name), SUBTRACT(LEN(name), 2))",
+                    "variables": {
+                        "name": "Script"
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 4,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "IF(true, SUM([1,2,3]), MULTIPLY(2,3))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 6,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_error_handling": [
+            {
+                "input": {
+                    "expression": "DIVIDE(10, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "error": {
+                        "type": "Division By Zero Error",
+                        "message": "Division by zero results in undefined."
+                    }
+                }
+            }
+        ],
+        "test_error_handling_scenarios": [
+            {
+                "input": {
+                    "expression": "ADD(\"5\", 10)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "error": {
+                        "type": "Type Error",
+                        "message": "Cannot add 'String' and 'Integer'"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "SUBTRACT([1, 2, 3], 1)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "error": {
+                        "type": "Type Error",
+                        "message": null
+                    }
+                }
+            }
+        ],
+        "test_error_scenarios_and_edge_cases": [
+            {
+                "input": {
+                    "expression": "DIVIDE(\"10\", 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "error": {
+                        "type": "Type Error",
+                        "message": "Cannot divide type 'String' by type 'Integer'."
+                    }
+                }
+            }
+        ],
+        "test_function_calls_with_complex_arguments": [
+            {
+                "input": {
+                    "expression": "STRING(ADD(INTEGER(\"3\"), DECIMAL(\"2.5\"), MULTIPLY(2, 2)))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "9.5",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "BOOLEAN(LEN(\"test\") == 4)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_function_usage_with_nested_calls": [
+            {
+                "input": {
+                    "expression": "MULTIPLY(DECIMAL(\"3.5\"), INTEGER(2.5))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 7.0,
+                        "type": "Decimal"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "ADD(STRING(LEN(\"abc\")), STRING(LEN(\"def\")))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "33",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_kvs_and_list_integration": [
+            {
+                "input": {
+                    "expression": "KEYS({ \"name\": \"OQS\", \"version\": \"0.1\" }) + VALUES({ \"name\": \"OQS\", \"version\": \"0.1\" })",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            "name",
+                            "version",
+                            "OQS",
+                            "0.1"
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "UPDATE(kvs, \"new\", ADD(ACCESS(kvs, \"existing\"), 10))",
+                    "variables": {
+                        "kvs": {
+                            "existing": 5,
+                            "new": 15
+                        }
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "existing": 5,
+                            "new": 15
+                        },
+                        "type": "KVS"
+                    }
+                }
+            }
+        ],
+        "test_list_and_kvs_combinations": [
+            {
+                "input": {
+                    "expression": "APPEND(UNIQUE([1, 2, 2, 3]), MAX(***[4, 5, 6]))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            6
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "ACCESS({***{\"key\": \"value\"}, ***{\"another\": SUM([1, 2, 3])}}, \"another\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 6,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_list_and_kvs_operations": [
+            {
+                "input": {
+                    "expression": "[1, 2, 3] + REVERSE([4, 5, 6])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            6,
+                            5,
+                            4
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "KEYS({ \"a\": 1, \"b\": 2 }) + VALUES({ \"a\": 1, \"b\": 2 })",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            "a",
+                            "b",
+                            1,
+                            2
+                        ],
+                        "type": "List"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "SUM([1, 2, 3, 4])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 10,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "MAX(***numbers)",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 5,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_nested_and_conditional_expressions": [
+            {
+                "input": {
+                    "expression": "IF(LEN(name) > 5, LEN(name), \"short\")",
+                    "variables": {
+                        "name": "OpenQuickScript"
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 15,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRING(ADD(1, IF(true, 2, 3)))",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "3",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_numerical_and_string_operations": [
+            {
+                "input": {
+                    "expression": "3 ** 2 + LEN(\"test\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 13,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRING(5.0 * 2) - \".0\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "10",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_embedded_and_complex_unpacking": [
+            {
+                "input": {
+                    "expression": "<{MULTIPLY(2, LEN(text))}> is twice the length",
+                    "variables": {
+                        "text": "Test"
+                    },
+                    "string_embedded": true
+                },
+                "output": {
+                    "results": {
+                        "value": "8 is twice the length",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "SUM([***numbers, ***REVERSE(numbers)])",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            3
+                        ]
+                    },
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 12,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_string_embedded_and_unpacking_expressions": [
+            {
+                "input": {
+                    "expression": "<{ADD(1, LEN(text))}> is the length",
+                    "variables": {
+                        "text": "Hello"
+                    },
+                    "string_embedded": true
+                },
+                "output": {
+                    "results": {
+                        "value": "6 is the length",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "{ \"sum\": \"<{SUM([***numbers])}>\", \"max\": \"<{MAX(***numbers)}>\" }",
+                    "variables": {
+                        "numbers": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ]
+                    },
+                    "string_embedded": true
+                },
+                "output": {
+                    "results": {
+                        "value": "{ \"sum\": \"10\", \"max\": \"4\" }",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_embedded_expressions": [
+            {
+                "input": {
+                    "expression": "<{ADD(1, 2)}> + <{MULTIPLY(3, 4)}>",
+                    "variables": null,
+                    "string_embedded": true
+                },
+                "output": {
+                    "results": {
+                        "value": "3 + 12",
+                        "type": "String"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "Result is <{IF(LEN(text) == 5, \"five\", \"not five\")}>.",
+                    "variables": {
+                        "text": "Hello"
+                    },
+                    "string_embedded": true
+                },
+                "output": {
+                    "results": {
+                        "value": "Result is five.",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_string_manipulation_and_comparisons": [
+            {
+                "input": {
+                    "expression": "LEN(\"Concatenate\") == 11",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRING(LEN(\"Concatenate\") == 11)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "true",
+                        "type": "String"
+                    }
+                }
+            }
+        ]
+    }
+}
