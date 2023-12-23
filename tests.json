@@ -509,7 +509,7 @@
                 "output": {
                     "error": {
                         "type": "Type Error",
-                        "message": null
+                        "message": "Cannot subtract 'List' by 'Integer'"
                     }
                 }
             }

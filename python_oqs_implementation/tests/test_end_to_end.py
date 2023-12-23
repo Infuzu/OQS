@@ -237,7 +237,12 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         self.leer(
             'ADD("5", 10)', expected_type=ETS.TYPE, expect_error=True, error_message="Cannot add 'String' and 'Integer'"
         )
-        self.leer('SUBTRACT([1, 2, 3], 1)', expected_type=ETS.TYPE, expect_error=True)
+        self.leer(
+            'SUBTRACT([1, 2, 3], 1)',
+            expected_type=ETS.TYPE,
+            expect_error=True,
+            error_message="Cannot subtract 'List' by 'Integer'"
+        )
 
     def test_string_embedded_and_complex_unpacking(self):
         self.leer(
