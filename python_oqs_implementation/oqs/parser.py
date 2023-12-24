@@ -211,7 +211,6 @@ class OQSParser:
         return [token.strip() for token in tokens if token.strip()]
 
     def parse_expression(self, tokens: list[str]) -> ASTNode:
-        print(tokens)
         if len(tokens) == 0:
             return NullNode()
         elif len(tokens) == 1:
