@@ -5,13 +5,16 @@ from tests.cases import generate_tests_json
 
 def main():
     generate_tests_json()
-    expression: str = 'IF("text" - "t" == "ex", "Correct", "Incorrect")'
+    def expression(iteration: int = 1) -> str:
+        return 'SUM([' + '       EXPONENTIATE(ADD(6, EXPONENTIATE(7, 3)), MULTIPLY(8, DECIMAL(9))), ' * 1000 + '])'
     variables: dict[str, any] = {}
     string_embedded: bool = False
-    result: dict[str, any] = oqs_engine(
-        expression=expression, variables=variables, string_embedded=string_embedded, report_usage=True
-    )
-    print(json.dumps(result, indent=4))
+    for i in range(1):
+        result: dict[str, any] = oqs_engine(
+            expression=expression(i), variables=variables, string_embedded=string_embedded, report_usage=True
+        )
+        print(i)
+        print(json.dumps(result, indent=4))
 
 
 if __name__ == "__main__":
