@@ -69,7 +69,7 @@ class OQSInterpreter:
         self.variables: dict[str, any] = variables if variables else {}
 
     def add_additional_function(self, function_name: str, function: Callable):
-        self.FUNCTIONS[function_name] = function
+        self.FUNCTIONS[function_name.upper()] = function
 
     def results(self) -> any:
         return self.evaluate(self.original_ast)
