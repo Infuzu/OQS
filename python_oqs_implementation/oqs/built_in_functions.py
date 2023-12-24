@@ -1,5 +1,5 @@
 import json
-from python_oqs_implementation.oqs.constants.values import MAX_ARGS
+from .constants.values import MAX_ARGS
 from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
 from .nodes import FunctionNode
 from .utils.shortcuts import get_oqs_type
