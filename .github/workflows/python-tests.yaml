@@ -3,8 +3,12 @@ name: Python application test
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'python_oqs_implementation/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'python_oqs_implementation/**'
 
 jobs:
   build:
