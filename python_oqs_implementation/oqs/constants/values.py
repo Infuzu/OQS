@@ -1,5 +1,6 @@
 from .types import ValueTypeStrings as VTS
 
+
 OQS_TYPE_MAPPING: dict[type, str] = {
     int: VTS.INTEGER,
     float: VTS.DECIMAL,
