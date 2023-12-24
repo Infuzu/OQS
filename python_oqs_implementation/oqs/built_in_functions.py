@@ -62,10 +62,11 @@ def bif_divide(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float
     a, b = [interpreter.evaluate(arg) for arg in node.args]
     if b == 0:
         raise OQSDivisionByZeroError()
-    if isinstance(a, int) and isinstance(b, int) and a / b == int(a / b):
-        return int(a / b)
-    elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
-        return a / b
+    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+        results: float = a / b
+        if isinstance(a, int) and isinstance(b, int) and results == int(results):
+            return int(results)
+        return results
     else:
         raise OQSTypeError(message=f"Cannot divide type '{get_oqs_type(a)}' by type '{get_oqs_type(b)}'.")
 
