@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.2
+## Version: 0.3
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -67,8 +67,19 @@ Operators, which are foundational to the interaction between types, are clarifie
 - The syntax for invoking functions is an identifier that starts with a letter followed by any combination of letters, numbers, or underscores, then an opening parenthesis `(`, an optional comma-seperated list of arguments, and a closing parentheses `)`.
 
 
+### Order of Operations
+The `OQS` language adheres to a conventional order of operations to ensure predictable and logical results in expressions. This hierarchy is particularly crucial in expressions involving multiple operators:
+
+1. Parentheses: Expressions within parentheses are evaluated first. 
+2. Exponentiation: Operations involving exponentiation are next. 
+3. Multiplication and Division: These operations are performed from left to right. 
+4. Addition and Subtraction: Finally, addition and subtraction are performed, also from left to right.
+
+Failing to respect this order will lead to incorrect results and may cause errors in the execution of scripts.
+
+
 ### Parentheses in Expressions
-- Parentheses `()` can be used in all expressions to separate parts of the expressions and clarify priority. This is applicable in mathematical operations, string manipulation, and other contexts where expression clarity and evaluation order are crucial.
+- In `OQS`, parentheses `()` play a pivotal role in structuring expressions. They not only clarify the sequence in which operations are performed but also allow for overriding the default order of operations. Parentheses ensure that the enclosed expression is evaluated first, regardless of the types of operations involved.
 
 
 ### Unpacking Syntax
@@ -110,7 +121,52 @@ Interactions between types are explicitly defined within `OQS` as follows:
 
 
 ### Error Handling
-Language engines are expected to provide comprehensive errors for issues such as undefined variable usage, improper type manipulation, syntax mistakes in expressions, and incorrect function usage (invalid number or type of arguments).
+`OQS` language engines must implement comprehensive error handling to ensure robust and predictable scripting experiences. The following error types and their contexts of occurrence are detailed:
+
+#### Error Types and Contexts
+- **Invalid Argument Quantity Error**
+  - Raised when a function receives fewer or more arguments than expected. 
+  - Example: `ADD(1)` or `ADD(1, 2, 3, 4, 5)` if `ADD` expects two arguments. 
+- **Syntax Error**
+  - Raised for general syntax mistakes in expressions. 
+  - Example: `"Hello" "World"` (missing operator). 
+- **Type Error**
+  - Raised when an operation is performed on incompatible types. 
+  - Example: `"Hello" - 5` (string and integer). 
+- **Undefined Variable Error**
+  - Raised when an expression refers to a variable that has not been defined. 
+  - Example: `x + 2` where `x` is undefined. 
+- **Undefined Function Error**
+  - Raised when an expression calls a function that does not exist. 
+  - Example: `NONEXISTENT_FUNCTION(1, 2)`. 
+- **Function Evaluation Error**
+  - Raised when an error occurs within the execution of a function. 
+  - Example: `DIVIDE(1, 0)` within a function causing a division by zero error. 
+- **Division By Zero Error**
+  - Raised when an attempt is made to divide by zero. 
+  - Example: `10 / 0`. 
+- **Unexpected Character Error**
+  - Raised when an unexpected character is encountered in the expression. 
+  - Example: `2 * 5 @ 3` (unexpected @). 
+- **Missing Expected Character Error**
+  - Raised when an expected character is missing in the expression. 
+  - Example: `ADD(5, 6` (missing closing parenthesis).
+
+#### Implementing Error Handling
+- Errors must provide clear and informative messages to aid in debugging. 
+- Errors should be specific to the type of issue encountered to facilitate easier identification and resolution. 
+- Implementations should include error handling as part of the language engine to maintain consistency across different environments.
+
+#### Examples of Error Handling in Action:
+- **Invalid Argument Quantity**: `ADD(1)` → "Invalid Argument Quantity Error: Expected 2 arguments, but got 1."
+- **Syntax Error**: `"Hello" "World"` → "Syntax Error: Missing operator between expressions."
+- **Type Error**: `"Hello" - 5` → "Type Error: Cannot subtract Integer from String."
+- **Undefined Variable**: `x + 2` → "Undefined Variable Error: Variable 'x' is not defined."
+- **Undefined Function**: `NONEXISTENT_FUNCTION(1, 2)` → "Undefined Function Error: Function 'NONEXISTENT_FUNCTION' is not a valid function."
+- **Function Evaluation**: `DIVIDE(1, 0)` inside a function → "Function Evaluation Error: Division by zero in function 'DIVIDE'."
+- **Division By Zero**: `10 / 0` → "Division By Zero Error: Division by zero results in undefined."
+- **Unexpected Character**: `2 * 5 @ 3` → "Unexpected Character Error: '@' is not a valid character in expressions."
+- **Missing Expected Character**: `ADD(5, 6` → "Missing Expected Character Error: Expected ')'."
 
 
 ### Built-in Functions
@@ -141,6 +197,22 @@ Language engines are expected to provide comprehensive errors for issues such as
 - `REMOVE(list/kvs, index[for list]/key[for kvs])`: Removes an item from a list/kvs by index/key (supports negative indexing) and returns the adjusted list/kvs. Raises an error if the index does not exist. Does not raise an error if a key does not exist.
 - `ACCESS(list/kvs, index[for list]/key[for kvs], [optional default value for kvs access])`: Returns an item from a list/kvs by index/keu (supports negative indexing). Raises an error if the index does not exist. Returns null if the key does not exist or the default value if specified in the third argument.
 - `IF(condition1, result1, ..., conditionN, resultN, [else_result])`: Takes a minimum of two arguments up to an unlimited amount. Treats all arguments as condition result pairs if an even number of arguments are passes. If an odd number of arguments are passes, all but the last are treated as condition-result pairs, with the last argument being the `else` result. Returns the result corresponding to the first true condition, or the `else` result if none are met. Conditions are evaluated for truthiness, and no condition or result is evaluated until needed, ensuring that errors in non-relevant conditions or results do not affect the evaluation.
+
+
+### Case Sensitivity
+#### Function Name Case Insensitivity
+- In `OQS`, function names are case-insensitive. This means that a function can be called using any combination of uppercase and lowercase letters, and it will be interpreted as the same function. 
+  - Example: `ADD(1, 2)`, `add(1, 2)`, and `AdD(1, 2)` will all be interpreted as calls to the same addition function. 
+- This design choice is intended to reduce errors and confusion related to function naming conventions, thereby making the language more user-friendly.
+
+#### Variable Name Case Sensitivity
+- Unlike function names, variable names in OQS are case-sensitive. This means that variables with the same spelling but different cases will be treated as distinct. 
+  - Example: `Variable`, `variable`, and `VARIABLE` are considered three separate variables. 
+- Case sensitivity in variable names allows for more precise and controlled scripting, as it enables distinct naming for different variables even with similar spellings.
+
+#### Guidelines for Developers and Users
+- Developers implementing `OQS` engines and users writing scripts in `OQS` should be mindful of these case sensitivity rules.
+- It is recommended to follow consistent naming conventions for clarity and maintainability. For instance, using camelCase or snake_case consistently for variable names can enhance readability.
 
 
 ### Examples
@@ -200,6 +272,13 @@ Expressions evaluated in `OQS` should yield identical results across different i
   - **Input**: `IF(LEN("test") == 4, "valid", "invalid")` **Output**: `"valid"`
   - **Input**: `ADD(*[1, 2, 3, 4])` **Output**: `10`
   - **Input**: `MULTIPLY(STRING(2), 3)` **Output**: `"222"`
+- **Order of Operations**:
+  - **Input**: 2 + 3 * 4 **Output**: 14 (Multiplication is performed before addition)
+  - **Input**: (2 + 3) * 4 **Output**: 20 (Parentheses alter the order, causing addition to be performed first)
+- **Parentheses**:
+  - **Input**: 4 * (2 + 3) **Output**: 20 (Parentheses cause addition to be prioritized over multiplication)
+  - **Input**: ((2 + 3) * 4) / 2 **Output**: 10 (Nested parentheses guide the sequence of operations)
+
 
 
 ### Implementation Recommendations
