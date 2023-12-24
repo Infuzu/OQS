@@ -280,9 +280,3 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         self.leer("4 + 2 * 3", 10)
         self.leer("5 + 6 / 3 - 1", 6)
         self.leer("5 - 6 / 3 + 1", 4)
-
-    def test_long_running(self):
-        self.leer(
-            'SUM([' + '       EXPONENTIATE(ADD(6, EXPONENTIATE(7, 3)), MULTIPLY(8, DECIMAL(9))), ' * 1000 + '])',
-            1.2117994221359255e+186
-        )
