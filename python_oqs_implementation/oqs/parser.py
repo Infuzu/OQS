@@ -17,6 +17,11 @@ from .nodes import (
 
 
 class OQSParser:
+    OPERATOR_PRECEDENCE: dict[str, int] = {
+        '**': 1, '*': 2, '/': 2, '%': 2, '+': 3, '-': 3,
+        '==': 4, '!=': 4, '<': 4, '<=': 4, '>': 4, '>=': 4, '===': 4, '!==': 4
+    }
+
     def parse(self, expression: str) -> ASTNode:
         tokens: list[str] = self.tokenize_expression(expression=expression)
         return self.parse_expression(tokens=tokens)
@@ -205,35 +210,45 @@ class OQSParser:
 
         return [token.strip() for token in tokens if token.strip()]
 
-    def parse_expression(self, tokens: list[str], pos: int = 0) -> ASTNode | type(None):
-        left: ASTNode = self.parse_term(tokens=tokens, pos=pos)
-        pos += 1
-        while pos < len(tokens):
-            op: str = tokens[pos]
+    def parse_expression(self, tokens: list[str]) -> ASTNode:
+        print(tokens)
+        if len(tokens) == 0:
+            return NullNode()
+        elif len(tokens) == 1:
+            return self.parse_term(tokens[0])
+
+        op_pos: int | None = None
+        highest_precedence: int = 0
+        for i, token in reversed(list(enumerate(tokens))):
+            if token in self.OPERATOR_PRECEDENCE and self.OPERATOR_PRECEDENCE[token] > highest_precedence:
+                highest_precedence: int = self.OPERATOR_PRECEDENCE[token]
+                op_pos: int = i
+
+        if op_pos is not None:
+            if op_pos == 0:
+                raise OQSUnexpectedCharacterError(
+                    message=f"Cannot process an operator without something in front of it: {tokens[op_pos]}."
+                )
+            elif op_pos + 2 > len(tokens):
+                raise OQSMissingExpectedCharacterError(
+                    message=f"Missing expected value after operator: {tokens[op_pos]}."
+                )
+            left_tokens: list[str] = tokens[:op_pos]
+            right_tokens: list[str] = tokens[op_pos + 1:]
+
+            left_subtree: ASTNode = self.parse_expression(left_tokens)
+            right_subtree: ASTNode = self.parse_expression(right_tokens)
+
+            op: str = tokens[op_pos]
+
             if op in ['==', '!=', '<', '<=', '>', '>=', '===', '!==']:
-                pos += 1
-                if pos < len(tokens):
-                    right: ASTNode = self.parse_term(tokens, pos)
-                    left: ASTNode = ComparisonOpNode(left=left, op=op, right=right)
-                    pos += 1
-                else:
-                    raise OQSSyntaxError("Unexpected end of expression after comparison operator.")
+                return ComparisonOpNode(left=left_subtree, op=op, right=right_subtree)
             elif op in ['+', '-', '*', '/', '%', '**']:
-                pos += 1
-                if pos < len(tokens):
-                    right: ASTNode = self.parse_term(tokens, pos)
-                    left: ASTNode = BinaryOpNode(left=left, op=op, right=right)
-                    pos += 1
-                else:
-                    raise OQSSyntaxError("Unexpected end of expression after binary operator.")
+                return BinaryOpNode(left=left_subtree, op=op, right=right_subtree)
             else:
                 raise OQSSyntaxError(f"Invalid Operator: '{op}'")
-        return left
 
-    def parse_term(self, tokens: list[str], pos: int) -> ASTNode:
-        if len(tokens) <= pos:
-            return NullNode()
-        token: str = tokens[pos]
+    def parse_term(self, token: str) -> ASTNode:
         try:
             return NumberNode(value=int(token))
         except ValueError:
@@ -266,7 +281,7 @@ class OQSParser:
         function_name, args_str = token[:-1].split('(', 1)
         args_tokens: list[str] = self.separate_arguments(expression=args_str)
         args: list[ASTNode] = [
-            self.parse_term([arg], 0)
+            self.parse_term(arg)
             if arg.startswith('***') else UnparsedNode(token=arg) for arg in args_tokens
         ]
         return FunctionNode(name=function_name, args=args)
@@ -275,7 +290,7 @@ class OQSParser:
         if not args_str.strip():
             return []
         args_tokens: list[str] = self.separate_arguments(expression=args_str)
-        return [self.parse_expression(tokens=[token], pos=0) for token in args_tokens]
+        return [self.parse_expression(tokens=[token]) for token in args_tokens]
 
     def parse_kvs(self, kvs_str: str) -> dict[ASTNode, ASTNode]:
         kvs_tokens: list[str] = self.separate_arguments(expression=kvs_str)
@@ -286,7 +301,7 @@ class OQSParser:
                 value: str = token
             else:
                 key, value = self.split_key_value_pair(token)
-            kvs[self.parse_expression([key], 0)] = self.parse_expression([value], 0)
+            kvs[self.parse_expression([key])] = self.parse_expression([value])
         return kvs
 
     @staticmethod

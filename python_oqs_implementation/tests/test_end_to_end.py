@@ -264,3 +264,19 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
     def test_complex_evaluation_involving_multiple_data_types(self):
         self.leer('STRING(ADD(***[1, 2, 3], LEN("[1, 2, 3]")))', "15")
         self.leer("SUM([1, 2, 3]) == STRING(6)", False)
+
+    def test_order_of_operations(self):
+        self.leer("1 + 2 * 3", 7)
+        self.leer("1 * 2 + 3", 5)
+        self.leer("(1 + 2) * 3", 9)
+        self.leer("2 ** 3 * 4", 32)
+        self.leer("2 * 3 ** 2", 18)
+        self.leer("18 / 2 * 3", 27.0)
+        self.leer("18 / (2 * 3)", 3.0)
+        self.leer("4 + 3 - 2", 5)
+        self.leer("4 - 3 + 2", 3)
+        self.leer("4 * (2 + 3)", 20)
+        self.leer("4 * 2 + 3", 11)
+        self.leer("4 + 2 * 3", 10)
+        self.leer("5 + 6 / 3 - 1", 6.0)
+        self.leer("5 - 6 / 3 + 1", 4.0)

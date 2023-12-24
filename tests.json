@@ -831,6 +831,86 @@
                 }
             }
         ],
+        "test_order_of_operations": [
+            {
+                "input": {
+                    "expression": "1 + 2 * 3",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 7,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "1 * 2 + 3",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 5,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "(1 + 2) * 3",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 9,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "2 ** 3 * 4",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 32,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "2 * 3 ** 2",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 18,
+                        "type": "Integer"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "18 / 2 * 3",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": 27,
+                        "type": "Integer"
+                    }
+                }
+            }
+        ],
         "test_string_embedded_and_complex_unpacking": [
             {
                 "input": {
