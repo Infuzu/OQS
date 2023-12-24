@@ -8,7 +8,9 @@ def main():
     expression: str = 'IF("text" - "t" == "ex", "Correct", "Incorrect")'
     variables: dict[str, any] = {}
     string_embedded: bool = False
-    result: dict[str, any] = oqs_engine(expression=expression, variables=variables, string_embedded=string_embedded)
+    result: dict[str, any] = oqs_engine(
+        expression=expression, variables=variables, string_embedded=string_embedded, report_usage=True
+    )
     print(json.dumps(result, indent=4))
 
 
