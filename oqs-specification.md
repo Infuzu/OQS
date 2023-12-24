@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.3
+## Version: 0.4
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -230,5 +230,5 @@ The `OQS` language and this specification are supported and maintained by [Infuz
 
 Yidi Sprei is the founding author of `OQS` and wrote the first version of the specification.
 
-The following individuals are core maintainers:
+The following individuals are core maintainers of the Python OQS Implementation:
 - Yidi Sprei
