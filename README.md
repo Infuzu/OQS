@@ -44,7 +44,7 @@ The `OQS` language is designed to be open and universal. We encourage everyone t
 
 We endorse the principles of open-source and encourage the community to engage with, enhance, and disseminate `OQS` while respecting the terms of this license.
 
-For complete license details, refer to the [LICENSE](https://github.com/Infuzu/OQS/blob/main/LICENSE) file in the repository.
+For complete license details, refer to the [LICENSE](https://github.com/Infuzu/OQS/blob/main/LICENSE.md) file in the repository.
 
 
 
