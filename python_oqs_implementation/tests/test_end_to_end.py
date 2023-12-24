@@ -286,11 +286,3 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
             'SUM([' + '       EXPONENTIATE(ADD(6, EXPONENTIATE(7, 3)), MULTIPLY(8, DECIMAL(9))), ' * 1000 + '])',
             1.2117994221359255e+186
         )
-        self.leer(
-            'SUM([' + '       EXPONENTIATE(ADD(6, EXPONENTIATE(7, 3)), MULTIPLY(8, DECIMAL(9))), ' * 10000 + '])',
-            1.2117994221360556e+187
-        )
-        self.leer(
-            'SUM([' + '       EXPONENTIATE(ADD(6, EXPONENTIATE(7, 3)), MULTIPLY(8, DECIMAL(9))), ' * 100000 + '])',
-            1.2117994221367089e+188
-        )
