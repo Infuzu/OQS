@@ -17,7 +17,7 @@ class TestLanguageEngine(unittest.TestCase):
         self.leer("2 * 5", 10)
 
     def test_divide(self):
-        self.leer("10 / 2", 5.0)
+        self.leer("10 / 2", 5)
 
     def test_modulo(self):
         self.leer("9 % 2", 1)
@@ -160,7 +160,7 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         )
 
     def test_advanced_numerical_operations(self):
-        self.leer('MODULO(15, 4) + DIVIDE(20, 5)', 7.0)
+        self.leer('MODULO(15, 4) + DIVIDE(20, 5)', 7)
         self.leer('EXPONENTIATE(ADD(2, 3), SUBTRACT(5, 2))', 125)
 
     def test_complex_string_manipulation(self):
@@ -214,7 +214,7 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         )
 
     def test_advanced_mathematical_operations(self):
-        self.leer('MODULO(ADD(15, 5), DIVIDE(20, 2))', 0.0)
+        self.leer('MODULO(ADD(15, 5), DIVIDE(20, 2))', 0)
         self.leer('EXPONENTIATE(SUBTRACT(10, 2), 3)', 512)
 
     def test_string_manipulation_and_comparisons(self):
@@ -271,12 +271,12 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         self.leer("(1 + 2) * 3", 9)
         self.leer("2 ** 3 * 4", 32)
         self.leer("2 * 3 ** 2", 18)
-        self.leer("18 / 2 * 3", 27.0)
-        self.leer("18 / (2 * 3)", 3.0)
+        self.leer("18 / 2 * 3", 27)
+        self.leer("18 / (2 * 3)", 3)
         self.leer("4 + 3 - 2", 5)
         self.leer("4 - 3 + 2", 3)
         self.leer("4 * (2 + 3)", 20)
         self.leer("4 * 2 + 3", 11)
         self.leer("4 + 2 * 3", 10)
-        self.leer("5 + 6 / 3 - 1", 6.0)
-        self.leer("5 - 6 / 3 + 1", 4.0)
+        self.leer("5 + 6 / 3 - 1", 6)
+        self.leer("5 - 6 / 3 + 1", 4)

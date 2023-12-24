@@ -1,5 +1,4 @@
 import json
-
 from python_oqs_implementation.oqs.constants.values import MAX_ARGS
 from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
 from .nodes import FunctionNode
@@ -63,7 +62,9 @@ def bif_divide(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float
     a, b = [interpreter.evaluate(arg) for arg in node.args]
     if b == 0:
         raise OQSDivisionByZeroError()
-    if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+    if isinstance(a, int) and isinstance(b, int) and a / b == int(a / b):
+        return int(a / b)
+    elif isinstance(a, (int, float)) and isinstance(b, (int, float)):
         return a / b
     else:
         raise OQSTypeError(message=f"Cannot divide type '{get_oqs_type(a)}' by type '{get_oqs_type(b)}'.")
