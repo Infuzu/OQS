@@ -68,6 +68,9 @@ class OQSInterpreter:
         self.original_ast: ASTNode = self.parser.parse(expression=self.original_expression)
         self.variables: dict[str, any] = variables if variables else {}
 
+    def add_additional_function(self, function_name: str, function: Callable):
+        self.FUNCTIONS[function_name] = function
+
     def results(self) -> any:
         return self.evaluate(self.original_ast)
 
