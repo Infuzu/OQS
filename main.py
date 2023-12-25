@@ -4,7 +4,7 @@ from tests.cases import generate_tests_json
 
 
 def main():
-    # generate_tests_json()
+    generate_tests_json()
     def expression(iteration: int = 1) -> str:
         return 'EQUALS(2, 2, 2)'
     variables: dict[str, any] = {}

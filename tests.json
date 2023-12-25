@@ -1924,6 +1924,34 @@
                 }
             }
         ],
+        "test_equals": [
+            {
+                "input": {
+                    "expression": "EQUALS(2, 2, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "EQUALS(2, 2, 3)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
         "test_exponentiate": [
             {
                 "input": {
@@ -1954,6 +1982,62 @@
                             6
                         ],
                         "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_greater_than": [
+            {
+                "input": {
+                    "expression": "GREATER_THAN(3, 2, 1)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "GREATER_THAN(3, 1, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_greater_than_or_equal": [
+            {
+                "input": {
+                    "expression": "GREATER_THAN_OR_EQUAL(3, 2, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "GREATER_THAN_OR_EQUAL(2, 2, 3)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
                     }
                 }
             }
@@ -2036,6 +2120,62 @@
                 }
             }
         ],
+        "test_less_than": [
+            {
+                "input": {
+                    "expression": "LESS_THAN(1, 2, 3)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "LESS_THAN(1, 3, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_less_than_or_equal": [
+            {
+                "input": {
+                    "expression": "LESS_THAN_OR_EQUAL(1, 2, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "LESS_THAN_OR_EQUAL(2, 2, 1)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
         "test_max_function": [
             {
                 "input": {
@@ -2107,6 +2247,34 @@
                     "results": {
                         "value": "ababab",
                         "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_not_equals": [
+            {
+                "input": {
+                    "expression": "NOT_EQUALS(2, 3, 4)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT_EQUALS(2, 2, 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
                     }
                 }
             }
@@ -2221,6 +2389,62 @@
                             1
                         ],
                         "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_strictly_equals": [
+            {
+                "input": {
+                    "expression": "STRICTLY_EQUALS(\"2\", \"2\", \"2\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRICTLY_EQUALS(\"2\", \"2\", 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_strictly_not_equals": [
+            {
+                "input": {
+                    "expression": "STRICTLY_NOT_EQUALS(\"2\", \"3\", 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "STRICTLY_NOT_EQUALS(\"2\", \"2\", \"2\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
                     }
                 }
             }
