@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.3
+## Version: 0.4
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -129,7 +129,14 @@ Interactions between types are explicitly defined within `OQS` as follows:
   - Example: `ADD(1)` or `ADD(1, 2, 3, 4, 5)` if `ADD` expects two arguments. 
 - **Syntax Error**
   - Raised for general syntax mistakes in expressions. 
-  - Example: `"Hello" "World"` (missing operator). 
+  - Example: `{"string": variable} 5` (missing operator). 
+  - **Sub-Errors**:
+    - **Unexpected Character Error**
+      - Raised when an unexpected character is encountered in the expression. 
+      - Example: `5, 5` (unexpected `,`).
+    - **Missing Expected Character Error**
+      - Raised when an expected character is missing in the expression. 
+      - Example: `ADD(5, 6` (missing closing parenthesis).
 - **Type Error**
   - Raised when an operation is performed on incompatible types. 
   - Example: `"Hello" - 5` (string and integer). 
@@ -141,16 +148,9 @@ Interactions between types are explicitly defined within `OQS` as follows:
   - Example: `NONEXISTENT_FUNCTION(1, 2)`. 
 - **Function Evaluation Error**
   - Raised when an error occurs within the execution of a function. 
-  - Example: `DIVIDE(1, 0)` within a function causing a division by zero error. 
 - **Division By Zero Error**
   - Raised when an attempt is made to divide by zero. 
   - Example: `10 / 0`. 
-- **Unexpected Character Error**
-  - Raised when an unexpected character is encountered in the expression. 
-  - Example: `2 * 5 @ 3` (unexpected @). 
-- **Missing Expected Character Error**
-  - Raised when an expected character is missing in the expression. 
-  - Example: `ADD(5, 6` (missing closing parenthesis).
 
 #### Implementing Error Handling
 - Errors must provide clear and informative messages to aid in debugging. 
@@ -171,32 +171,154 @@ Interactions between types are explicitly defined within `OQS` as follows:
 
 ### Built-in Functions
 `OQS` should support a set of built-in functions, with each implementation having the freedom to include additional functions. (Functions must handle invalid inputs by raising appropriate errors.)
-- `ADD(argument1, argument2, ...)`: Adds numbers, concatenates strings, or merges lists. Accepts an unlimited number of arguments of the same type and performs the appropriate operation based on the type.
-- `SUBTRACT(argument1, argument2)`: Performs the subtraction operation on numbers, removes instances of `argument2` from `argument1` if they are strings or lists.
-- `MULTIPLY(argument1, argument2, ...)`: Multiplies numbers or repeats strings/lists. For numbers, all arguments are multiplied together. For strings/lists, the first argument is repeated a number of times equal to the product of the remaining numerical arguments.
-- `DIVIDE(argument1, argument2)`: Divides the first number by the second. Raises an error if the second argument is zero.
-- `EXPONENTIATE(base, exponent)`:  Raises the `base` to the power of `exponent`. Both arguments must be numbers.
-- `MODULO(number1, number2)`: Calculates the remainder of division of `number1` by `number2`.
-- `INTEGER(arugment)`: Returns a Decimal/String/Integer/Boolean in an Integer representation.
-- `DECIMAL(argument)`: Returns an Integer/String/Decimal in a Decimal representation.
-- `STRING(argument)`: Returns any single type in a String representation.
-- `LIST(argument1, argument2, ...)`: Returns a List containing the provided arguments in order.
-- `KVS(key1, value1, key2, value2, ..., keyN, valueN)`: Returns a kvs with all key value pairs. All keys must be strings. Raises an error if there is an odd amount of arguments.
-- `BOOLEAN(argument)`/`BOOL(argument)`: Returns a truthy evaluation of the argument. `0` or `0.0` will return `false` while any other number will return `true`. Empty strings or lists such as `""`, `''`, and `[]` will return `false` while the same examples with any characters or items will return `true`.
-- `KEYS(kvs)`: Returns a list of all keys in a KVS.
-- `VALUES(kvs)`: Returns a list of all values in a KVS.
-- `UNIQUE(list)`: Returns a list of all unique values in a list.
-- `REVERSE(list)`: Returns a list in reverse order.
-- `MAX(number1, number2, ..., numberN)`: Returns the maximum number among the arguments.
-- `MIN(number1, number2, ..., numberN)`: Returns the minimum number among the arguments.
-- `SUM(list)`: adds up all items in the list if they are of the same base type. Concatenates if all items are strings, adds numerically if all are numbers and returns the result. Raises an error for mixed types.
-- `LENGTH(object)`/`LEN(object)`: Returns the count of items in a list of characters in a string, integer, or decimal.
-- `APPEND(list, item)`: Appends an item of any type to the end of a list and returns the adjusted list.
-- `UPDATE(kvs/list, string[key for kvs]/integer[index for list], value)`: Updates a KVS or List with a new value. In lists, it raises an error if the specified index does not exist, otherwise, changes the value at specified index (supports negative indexing). In KVS, it sets the value for the specified key regardless of the current existence of that key.
-- `REMOVE_ITEM(list/kvs, item, max_occurences=unlimited)`: Removes an item from a list or kvs, with an optional third argument to specify the maximum number of occurrences to remove. If not specified, it removes all occurrences. If `max_occurrences` is set to 1, it only removes the first occurrence. It ultimately returns the adjusted list/kvs.
-- `REMOVE(list/kvs, index[for list]/key[for kvs])`: Removes an item from a list/kvs by index/key (supports negative indexing) and returns the adjusted list/kvs. Raises an error if the index does not exist. Does not raise an error if a key does not exist.
-- `ACCESS(list/kvs, index[for list]/key[for kvs], [optional default value for kvs access])`: Returns an item from a list/kvs by index/keu (supports negative indexing). Raises an error if the index does not exist. Returns null if the key does not exist or the default value if specified in the third argument.
-- `IF(condition1, result1, ..., conditionN, resultN, [else_result])`: Takes a minimum of two arguments up to an unlimited amount. Treats all arguments as condition result pairs if an even number of arguments are passes. If an odd number of arguments are passes, all but the last are treated as condition-result pairs, with the last argument being the `else` result. Returns the result corresponding to the first true condition, or the `else` result if none are met. Conditions are evaluated for truthiness, and no condition or result is evaluated until needed, ensuring that errors in non-relevant conditions or results do not affect the evaluation.
+- `ADD(argument1, argument2, ...)` - Adds Numbers, concatenates Strings, merges Lists or merges KVSs:
+  - **Inputs**: 
+    - **Amount**: A minimum of two inputs with no maximum.
+    - **Types**: All input types must be of the same type being one of the following:
+      - `Number`
+      - `String`
+      - `List`
+      - `KVS`
+  - **Outputs**: The same type that the inputs were. If one of the inputs was a `Decimal`, it will return a `Decimal`.
+- `SUBTRACT(argument1, argument2)` - Subtracts numbers or removes instances from strings/lists:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs required.
+      - **Types**:
+        - For numbers: Both `Number`. 
+        - For strings/lists: Both `String` or `List`.
+  - **Outputs**: The same type as the inputs.
+- `MULTIPLY(argument1, argument2, ...)` - Multiplies numbers or repeats strings/lists:
+  - **Inputs**:
+    - **Amount**: A minimum of two inputs with no maximum.
+    - **Types**: Either all `Number` or the first `String`/`List` and the rest `Number`.
+  - **Outputs**: The same type as the first input.
+- `DIVIDE(argument1, argument2)` - Divides the first number by the second:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: Both inputs must be `Number`.
+    - **Error Handling**: Raises an error if the second argument is zero.
+  - **Outputs**: `Number`.
+- `EXPONENTIATE(base, exponent)` - Raises a number to the power of another:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: Both inputs must be `Number`. 
+  - **Outputs**: `Number`.
+- `MODULO(number1, number2)` - Calculates the remainder of division:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: Both inputs must be `Number`.
+  - **Outputs**: `Number`.
+- `INTEGER(argument)` - Converts to an integer representation:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `Decimal`, `String`, `Integer`, or `Boolean`.
+  - **Outputs**: `Integer`.
+- `DECIMAL(argument)` - Converts to a decimal representation:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `Integer`, `String`, or `Decimal`.
+  - **Outputs**: `Decimal`.
+- `STRING(argument)` - Converts to a string representation:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: Any single type.
+  - **Outputs**: `String`.
+- `LIST(argument1, argument2, ...)` - Creates a list from provided arguments:
+  - **Inputs**:
+    - **Amount**: One or more inputs.
+    - **Types**: Any types.
+  - **Outputs**: `List`.
+- `KVS(key1, value1, key2, value2, ..., keyN, valueN)` - Creates a key-value store:
+  - **Inputs**:
+    - **Amount**: Even number of inputs (pairs of keys and values).
+    - **Types**: Keys must be `String`, values can be any type.
+    - **Error Handling**: Raises an error if an odd number of arguments is provided.
+  - **Outputs**: `KVS`.
+- `BOOLEAN(argument)`/`BOOL(argument)` - Evaluates the truthiness of an argument:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: Any single type.
+  - **Outputs**: `Boolean`.
+- `KEYS(kvs)` - Retrieves a list of all keys in a KVS:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `KVS`.
+  - **Outputs**: `List` of keys.
+- `VALUES(kvs)` - Retrieves a list of all values in a KVS:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `KVS`.
+  - **Outputs**: `List` of values.
+- `UNIQUE(list)` - Returns a list of unique values:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `List`.
+  - **Outputs**: `List` containing unique elements.
+- `REVERSE(list)` - Reverses the order of a list:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `List`.
+  - **Outputs**: `List` in reverse order.
+- `MAX(number1, number2, ..., numberN)` - Finds the maximum number:
+  - **Inputs**:
+    - **Amount**: A minimum of two inputs with no maximum.
+    - **Types**: All inputs must be `Number`.
+  - **Outputs**: `Number`.
+- `MIN(number1, number2, ..., numberN)` - Finds the minimum number:
+  - **Inputs**:
+    - **Amount**: A minimum of two inputs with no maximum.
+    - **Types**: All inputs must be `Number`.
+  - **Outputs**: `Number`.
+- `SUM(list)` - Adds up items in a list:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `List` with all elements of the same base type.
+    - **Error Handling**: Raises an error for mixed types.
+  - **Outputs**: The sum or concatenation of list items.
+- `LENGTH(object)`/`LEN(object)` - Returns the count of items or characters:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `List`, `String`, `Integer`, or `Decimal`.
+  - **Outputs**: `Integer`.
+- `APPEND(list, item)` - Appends an item to a list:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: First input must be a `List`, second can be any type. 
+  - **Outputs**: `List`.
+- `UPDATE(kvs/list, key/index, value)` - Updates a KVS or List with a new value:
+  - **Inputs**:
+    - **Amount**: Exactly three inputs.
+    - **Types**:
+      - For lists: First `List`, second `Integer` (index), third any type. 
+      - For KVS: First `KVS`, second and third any type (key and value).
+    - **Error Handling**: Raises an error if the index does not exist for lists. For KVS, adds or updates the key.
+  - **Outputs**: Updated `List` or `KVS`.
+- `REMOVE_ITEM(list/kvs, item, max_occurrences=unlimited)` - Removes an item from a list or KVS:
+  - **Inputs**:
+    - **Amount**: Two or three inputs.
+    - **Types**: First input must be `List` or `KVS`, second input is the item to remove, third (optional) is `Integer` for maximum occurrences.
+  - **Outputs**: Adjusted `List` or `KVS`.
+- `REMOVE(list/kvs, index/key)` - Removes an item from a list or KVS by index or key:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**:
+      - For lists: First `List`, second `Integer` (index). 
+      - For KVS: First `KVS`, second `String` (key).
+    - **Error Handling**: Raises an error if the index does not exist for lists; does not raise an error if a key does not exist in KVS.
+  - **Outputs**: Adjusted `List` or `KVS`.
+- `ACCESS(list/kvs, index/key, [optional default value])` - Accesses an item in a list or KVS:
+  - **Inputs**:
+    - **Amount**: Two or three inputs.
+    - **Types**:
+      - For lists: First `List`, second `Integer` (index). 
+      - For KVS: First `KVS`, second `String` (key), third (optional) any type (default value).
+    - **Error Handling**: Raises an error if the index does not exist for lists; returns null or default value if the key does not exist in KVS.
+  - **Outputs**: The accessed item or default value.
+- `IF(condition1, result1, ..., conditionN, resultN, [else_result])` - Evaluates conditions and returns corresponding results:
+  - **Inputs**:
+    - **Amount**: A minimum of two arguments up to an unlimited amount.
+    - **Types**: Alternating between conditions (any type evaluated for truthiness) and results (any type).
+  - **Outputs**: The result corresponding to the first true condition or the `else` result.
 
 
 ### Case Sensitivity
