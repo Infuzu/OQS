@@ -45,6 +45,8 @@ class OQSInterpreter:
         "KVS": built_in_functions.bif_kvs,
         "BOOLEAN": built_in_functions.bif_boolean,
         "BOOL": built_in_functions.bif_boolean,
+        "AND": built_in_functions.bif_and,
+        "OR": built_in_functions.bif_or,
         "KEYS": built_in_functions.bif_keys,
         "VALUES": built_in_functions.bif_values,
         "UNIQUE": built_in_functions.bif_unique,
@@ -136,6 +138,10 @@ class OQSInterpreter:
                 return type(left) == type(right) and left == right
             elif node.op == '!==':
                 return type(left) != type(right) or left != right
+            elif node.op == '&':
+                return bool(left) and bool(right)
+            elif node.op == '|':
+                return bool(left) or bool(right)
             else:
                 raise OQSSyntaxError(f"Invalid comparison operator '{node.op}'")
         elif isinstance(node, FunctionNode):

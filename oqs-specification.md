@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.5
+## Version: 0.6
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -51,6 +51,15 @@ Operators, which are foundational to the interaction between types, are clarifie
 #### Comparison Operators
 - Less-than `<`, greater-than `>`, less-than-or-equal-to `<=`, greater-than-or-equal-to `>=`, not-equal `!=`, equal `==`, strictly equal `===`, strictly not-equal `!==`: Comparisons require identical operand types (for `===` and `!==`) or equivalent values (for `==` and `!=`) and return a Boolean value. For `==` and `!=`, type conversions are allowed (e.g., integer `0` equals decimal `0.0`, and `"0.0"` equals `0.0`).
 
+#### Logical Operators
+- Logical `AND` (`&`): Returns `true` if both operands are truthy, otherwise `false`. 
+- Logical `OR` (`|`): Returns `true` if at least one operand is truthy, otherwise `false`.
+
+**Note**: 
+- Logical operators (`&` and `|`) evaluate the truthiness of operands. An operand is considered truthy if it is not false, zero, empty, null, or undefined. Otherwise, it is considered falsy. 
+- For example, non-zero numbers, non-empty strings/lists, and `true` are truthy. Zero, null, empty strings/lists, and `false` are falsy. 
+- Short-circuit evaluation should be implemented for efficiency. For the `&` operator, if the first operand is falsy, the second operand is not evaluated. For the `|` operator, if the first operand is truthy, the second operand is not evaluated.
+
 #### List Operators
 - Concatenation `+`: Required to merge two lists.
 - Subtraction `-`: Removes elements of the second list from the first one, if they are present.
@@ -95,27 +104,29 @@ Failing to respect this order will lead to incorrect results and may cause error
 Interactions between types are explicitly defined within `OQS` as follows:
 
 | Operator | Operand 1 | Operand 2 | Result   |
-|----------|-----------|-----------|----------|
-| +        | Number    | Number    | Number   |
-| +        | List      | List      | List     |
-| +        | KVS       | KVS       | KVS      |
-| +        | String    | String    | String   |
-| -        | Number    | Number    | Number   |
-| -        | List      | List      | List     |
-| -        | String    | String    | String   |
-| *        | Number    | Number    | Number   |
-| *        | String    | Integer   | String   |
-| /        | Number    | Number    | Number   |
-| **       | Number    | Number    | Number   |
-| %        | Number    | Number    | Number   |
-| <        | Number    | Number    | Boolean  |
-| <=       | Number    | Number    | Boolean  |
-| ==       | Any Type  | Any Type  | Boolean  |
-| !=       | Any Type  | Any Type  | Boolean  |
-| ===      | Any Type  | Any Type  | Boolean  |
-| !==      | Any Type  | Any Type  | Boolean  |
-| >        | Number    | Number    | Boolean  |
-| >=       | Number    | Number    | Boolean  |
+|---------|-----------|-----------|----------|
+| +       | Number    | Number    | Number   |
+| +       | List      | List      | List     |
+| +       | KVS       | KVS       | KVS      |
+| +       | String    | String    | String   |
+| -       | Number    | Number    | Number   |
+| -       | List      | List      | List     |
+| -       | String    | String    | String   |
+| *       | Number    | Number    | Number   |
+| *       | String    | Integer   | String   |
+| /       | Number    | Number    | Number   |
+| **      | Number    | Number    | Number   |
+| %       | Number    | Number    | Number   |
+| <       | Number    | Number    | Boolean  |
+| <=      | Number    | Number    | Boolean  |
+| ==      | Any Type  | Any Type  | Boolean  |
+| !=      | Any Type  | Any Type  | Boolean  |
+| ===     | Any Type  | Any Type  | Boolean  |
+| !==     | Any Type  | Any Type  | Boolean  |
+| >       | Number    | Number    | Boolean  |
+| >=      | Number    | Number    | Boolean  |
+| &       | Any Type  | Any Type  | Boolean  |
+| \|      | Any Type  | Any Type  | Boolean  |
 
 ("Any Type" indicates compatibility for comparisons between operands sharing a type.)
 
@@ -234,11 +245,27 @@ Interactions between types are explicitly defined within `OQS` as follows:
     - **Types**: Keys must be `String`, values can be any type.
     - **Error Handling**: Raises an error if an odd number of arguments is provided.
   - **Outputs**: `KVS`.
-- `BOOLEAN(argument)`/`BOOL(argument)` - Evaluates the truthiness of an argument:
+- `BOOLEAN(argument)` / `BOOL(argument)` - Evaluates the truthiness of an argument:
   - **Inputs**:
     - **Amount**: Exactly one input.
     - **Types**: Any single type.
-  - **Outputs**: `Boolean`.
+  - **Outputs**: `Boolean`.Great! To include the `AND` and `OR` functions in the `OQS` language guidelines, we can expand the "Built-in Functions" section. These functions will provide an alternative way to perform logical operations, particularly useful for handling multiple operands or integrating into more complex expressions.
+- `AND(argument1, argument2, ...)` - Performs a logical AND operation on all provided arguments:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, evaluated for their truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if all arguments are truthy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `AND(true, 1, "text")` **Output**: `true`
+    - **Input**: `AND(true, 0)` **Output**: `false`
+- `OR(argument1, argument2, ...)` - Performs a logical OR operation on all provided arguments:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, evaluated for their truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if at least one argument is truthy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `OR(false, 0, null, "text")` **Output**: `true`
+    - **Input**: `OR(false, 0, "")` **Output**: `false`
 - `KEYS(kvs)` - Retrieves a list of all keys in a KVS:
   - **Inputs**:
     - **Amount**: Exactly one input.
@@ -401,6 +428,11 @@ Expressions evaluated in `OQS` should yield identical results across different i
   - **Input**: `"Hello " + "World"` **Output**: `Hello World"`
   - **Input**: `"repeat" * 2` **Output**: `"repeatrepeat"`
   - **Input**: `"remove" - "move"` **Output**: `"re"`
+- **Logical Operations**:
+  - **Input**: `1 & 0` **Output**: `false` (1 is truthy, 0 is falsy)
+  - **Input**: `"text" | ""` **Output**: `true` ("text" is truthy, "" is falsy)
+  - **Input**: `(3 > 2) & [1]` **Output**: `true` (both expressions are truthy)
+  - **Input**: `null | "hello"` **Output**: `true` (null is falsy, "hello" is truthy)
 - **Boolean Operations**:
   - **Input**: `true == false` **Output**: `false`
   - **Input**: `true != false` **Output**: `true`

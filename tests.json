@@ -1484,6 +1484,88 @@
                 }
             }
         ],
+        "test_logical_and_operator": [
+            {
+                "input": {
+                    "expression": "true & false",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "1 & 0",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "\"text\" & \"\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_logical_or_operator": [
+            {
+                "input": {
+                    "expression": "false | true",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "0 | 1",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "\"\" | \"text\"",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
         "test_modulo": [
             {
                 "input": {
@@ -1718,6 +1800,47 @@
                     "results": {
                         "value": "Hello World",
                         "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_and_function": [
+            {
+                "input": {
+                    "expression": "AND(true, 1, \"text\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "AND(true, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "AND(false, \"non-empty string\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
                     }
                 }
             }
@@ -1984,6 +2107,47 @@
                     "results": {
                         "value": "ababab",
                         "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_or_function": [
+            {
+                "input": {
+                    "expression": "OR(false, 0, null, \"text\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "OR(false, 0, \"\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "OR(null, 0, false, \"\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
                     }
                 }
             }

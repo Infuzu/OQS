@@ -22,6 +22,16 @@ class TestLanguageEngine(unittest.TestCase):
     def test_modulo(self):
         self.leer("9 % 2", 1)
 
+    def test_logical_and_operator(self):
+        self.leer("true & false", False)
+        self.leer("1 & 0", False)
+        self.leer('"text" & ""', False)
+
+    def test_logical_or_operator(self):
+        self.leer("false | true", True)
+        self.leer("0 | 1", True)
+        self.leer('"" | "text"', True)
+
     def test_string_concatenation(self):
         self.leer('"Hello " + "World"', "Hello World")
 
@@ -344,6 +354,16 @@ class TestOQSFunctions(unittest.TestCase):
 
     def test_boolean_conversion(self):
         self.leer('BOOLEAN(1)', True)
+
+    def test_and_function(self):
+        self.leer('AND(true, 1, "text")', True)
+        self.leer('AND(true, 0)', False)
+        self.leer('AND(false, "non-empty string")', False)
+
+    def test_or_function(self):
+        self.leer('OR(false, 0, null, "text")', True)
+        self.leer('OR(false, 0, "")', False)
+        self.leer('OR(null, 0, false, "")', False)
 
     def test_keys_function(self):
         self.leer('KEYS({"name": "OQS", "type": "script"})', ["name", "type"])

@@ -187,6 +187,28 @@ def bif_boolean(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
     return bool(value)
 
 
+def bif_and(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) < 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    for arg in node.args:
+        if not interpreter.evaluate(arg):
+            return False
+    return True
+
+
+def bif_or(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) < 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    for arg in node.args:
+        if interpreter.evaluate(arg):
+            return True
+    return False
+
+
 def bif_keys(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[str]:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(

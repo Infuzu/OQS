@@ -19,7 +19,7 @@ from .nodes import (
 class OQSParser:
     OPERATOR_PRECEDENCE: dict[str, int] = {
         '**': 1, '*': 2, '/': 2, '%': 2, '+': 3, '-': 3,
-        '==': 4, '!=': 4, '<': 4, '<=': 4, '>': 4, '>=': 4, '===': 4, '!==': 4
+        '==': 4, '!=': 4, '<': 4, '<=': 4, '>': 4, '>=': 4, '===': 4, '!==': 4, '&': 4, '|': 4
     }
 
     def parse(self, expression: str) -> ASTNode:
@@ -29,7 +29,7 @@ class OQSParser:
     @staticmethod
     def tokenize_expression(expression: str) -> list[str]:
         def char_is_operator(single_char_str: str) -> bool:
-            return single_char_str in ['+', '-', '*', '/', '%', '<', '>', '=', '!']
+            return single_char_str in ['+', '-', '*', '/', '%', '<', '>', '=', '!', '&', '|']
 
         def token_is_operator(token: str) -> bool:
             return char_is_operator(token[0]) and not (token.startswith('***') and len(token) > 3 and token[3] != '*')
@@ -240,7 +240,7 @@ class OQSParser:
 
             op: str = tokens[op_pos]
 
-            if op in ['==', '!=', '<', '<=', '>', '>=', '===', '!==']:
+            if op in ['==', '!=', '<', '<=', '>', '>=', '===', '!==', '&', '|']:
                 return ComparisonOpNode(left=left_subtree, op=op, right=right_subtree)
             elif op in ['+', '-', '*', '/', '%', '**']:
                 return BinaryOpNode(left=left_subtree, op=op, right=right_subtree)

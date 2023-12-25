@@ -78,9 +78,8 @@ else:
 
 
 ### Built-in Functions
-`OQS` supports the following built-in functions:
 - `ADD(argument1, argument2, ...)` - Adds Numbers, concatenates Strings, merges Lists or merges KVSs:
-  - **Inputs**:
+  - **Inputs**: 
     - **Amount**: A minimum of two inputs with no maximum.
     - **Types**: All input types must be of the same type being one of the following:
       - `Number`
@@ -92,7 +91,7 @@ else:
   - **Inputs**:
     - **Amount**: Exactly two inputs required.
       - **Types**:
-        - For numbers: Both `Number`.
+        - For numbers: Both `Number`. 
         - For strings/lists: Both `String` or `List`.
   - **Outputs**: The same type as the inputs.
 - `MULTIPLY(argument1, argument2, ...)` - Multiplies numbers or repeats strings/lists:
@@ -109,7 +108,7 @@ else:
 - `EXPONENTIATE(base, exponent)` - Raises a number to the power of another:
   - **Inputs**:
     - **Amount**: Exactly two inputs.
-    - **Types**: Both inputs must be `Number`.
+    - **Types**: Both inputs must be `Number`. 
   - **Outputs**: `Number`.
 - `MODULO(number1, number2)` - Calculates the remainder of division:
   - **Inputs**:
@@ -142,11 +141,27 @@ else:
     - **Types**: Keys must be `String`, values can be any type.
     - **Error Handling**: Raises an error if an odd number of arguments is provided.
   - **Outputs**: `KVS`.
-- `BOOLEAN(argument)`/`BOOL(argument)` - Evaluates the truthiness of an argument:
+- `BOOLEAN(argument)` / `BOOL(argument)` - Evaluates the truthiness of an argument:
   - **Inputs**:
     - **Amount**: Exactly one input.
     - **Types**: Any single type.
-  - **Outputs**: `Boolean`.
+  - **Outputs**: `Boolean`.Great! To include the `AND` and `OR` functions in the `OQS` language guidelines, we can expand the "Built-in Functions" section. These functions will provide an alternative way to perform logical operations, particularly useful for handling multiple operands or integrating into more complex expressions.
+- `AND(argument1, argument2, ...)` - Performs a logical AND operation on all provided arguments:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, evaluated for their truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if all arguments are truthy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `AND(true, 1, "text")` **Output**: `true`
+    - **Input**: `AND(true, 0)` **Output**: `false`
+- `OR(argument1, argument2, ...)` - Performs a logical OR operation on all provided arguments:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, evaluated for their truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if at least one argument is truthy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `OR(false, 0, null, "text")` **Output**: `true`
+    - **Input**: `OR(false, 0, "")` **Output**: `false`
 - `KEYS(kvs)` - Retrieves a list of all keys in a KVS:
   - **Inputs**:
     - **Amount**: Exactly one input.
@@ -191,13 +206,13 @@ else:
 - `APPEND(list, item)` - Appends an item to a list:
   - **Inputs**:
     - **Amount**: Exactly two inputs.
-    - **Types**: First input must be a `List`, second can be any type.
+    - **Types**: First input must be a `List`, second can be any type. 
   - **Outputs**: `List`.
 - `UPDATE(kvs/list, key/index, value)` - Updates a KVS or List with a new value:
   - **Inputs**:
     - **Amount**: Exactly three inputs.
     - **Types**:
-      - For lists: First `List`, second `Integer` (index), third any type.
+      - For lists: First `List`, second `Integer` (index), third any type. 
       - For KVS: First `KVS`, second and third any type (key and value).
     - **Error Handling**: Raises an error if the index does not exist for lists. For KVS, adds or updates the key.
   - **Outputs**: Updated `List` or `KVS`.
@@ -210,7 +225,7 @@ else:
   - **Inputs**:
     - **Amount**: Exactly two inputs.
     - **Types**:
-      - For lists: First `List`, second `Integer` (index).
+      - For lists: First `List`, second `Integer` (index). 
       - For KVS: First `KVS`, second `String` (key).
     - **Error Handling**: Raises an error if the index does not exist for lists; does not raise an error if a key does not exist in KVS.
   - **Outputs**: Adjusted `List` or `KVS`.
@@ -218,7 +233,7 @@ else:
   - **Inputs**:
     - **Amount**: Two or three inputs.
     - **Types**:
-      - For lists: First `List`, second `Integer` (index).
+      - For lists: First `List`, second `Integer` (index). 
       - For KVS: First `KVS`, second `String` (key), third (optional) any type (default value).
     - **Error Handling**: Raises an error if the index does not exist for lists; returns null or default value if the key does not exist in KVS.
   - **Outputs**: The accessed item or default value.
