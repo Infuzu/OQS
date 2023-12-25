@@ -24,5 +24,5 @@ setup(
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.10',
-    license_files=('../LICENSE.md', )
+    license_files=('../LICENSE.md',)
 )
