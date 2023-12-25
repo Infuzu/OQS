@@ -59,7 +59,14 @@ class OQSInterpreter:
         "REMOVE_ITEM": built_in_functions.bif_remove_item,
         "REMOVE": built_in_functions.bif_remove,
         "ACCESS": built_in_functions.bif_access,
-        "IF": built_in_functions.bif_if
+        "IF": built_in_functions.bif_if,
+        "TYPE": built_in_functions.bif_type,
+        "IS_TYPE": built_in_functions.bif_is_type,
+        "TRY": built_in_functions.bif_try,
+        "RANGE": built_in_functions.bif_range,
+        "FOR": built_in_functions.bif_for_or_map,
+        "MAP": built_in_functions.bif_for_or_map,
+        "RAISE": built_in_functions.bif_raise
     }
 
     def __init__(self, expression: str, variables: dict[str, any] | None = None) -> None:

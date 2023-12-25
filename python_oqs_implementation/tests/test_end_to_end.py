@@ -280,3 +280,129 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         self.leer("4 + 2 * 3", 10)
         self.leer("5 + 6 / 3 - 1", 6)
         self.leer("5 - 6 / 3 + 1", 4)
+
+
+class TestOQSFunctions(unittest.TestCase):
+    def setUp(self):
+        self.cases: dict[str, list[dict[str, any]]] = {}
+
+    def leer(self, *args, **kwargs) -> None:
+        language_engine_expected_result(self, *args, **kwargs)
+
+    def test_add_numbers(self):
+        self.leer('ADD(1, 2)', 3)
+
+    def test_add_strings(self):
+        self.leer('ADD("Hello", " World")', "Hello World")
+
+    def test_add_lists(self):
+        self.leer('ADD([1, 2], [3, 4])', [1, 2, 3, 4])
+
+    def test_add_kvs(self):
+        self.leer('ADD({"a": 1}, {"b": 2})', {"a": 1, "b": 2})
+
+    def test_subtract_numbers(self):
+        self.leer('SUBTRACT(5, 3)', 2)
+
+    def test_subtract_strings(self):
+        self.leer('SUBTRACT("hello", "lo")', "hel")
+
+    def test_subtract_lists(self):
+        self.leer('SUBTRACT([1, 2, 3], [3])', [1, 2])
+
+    def test_multiply_numbers(self):
+        self.leer('MULTIPLY(3, 2)', 6)
+
+    def test_multiply_string(self):
+        self.leer('MULTIPLY("ab", 3)', "ababab")
+
+    def test_divide_numbers(self):
+        self.leer('DIVIDE(10, 2)', 5)
+
+    def test_divide_by_zero(self):
+        self.leer(
+            'DIVIDE(5, 0)',
+            expected_type=ETS.DIVISION_BY_ZERO,
+            expect_error=True,
+            error_message='Division by zero results in undefined.'
+        )
+
+    def test_exponentiate(self):
+        self.leer('EXPONENTIATE(2, 3)', 8)
+
+    def test_modulo(self):
+        self.leer('MODULO(10, 3)', 1)
+
+    def test_integer_conversion(self):
+        self.leer('INTEGER(3.5)', 3)
+
+    def test_decimal_conversion(self):
+        self.leer('DECIMAL("42")', 42.0)
+
+    def test_string_conversion(self):
+        self.leer('STRING([1, 2, 3])', "[1, 2, 3]")
+
+    def test_boolean_conversion(self):
+        self.leer('BOOLEAN(1)', True)
+
+    def test_keys_function(self):
+        self.leer('KEYS({"name": "OQS", "type": "script"})', ["name", "type"])
+
+    def test_values_function(self):
+        self.leer('VALUES({"name": "OQS", "type": "script"})', ["OQS", "script"])
+
+    def test_unique_function(self):
+        self.leer('UNIQUE([1, 2, 2, 3])', [1, 2, 3])
+
+    def test_reverse_function(self):
+        self.leer('REVERSE([1, 2, 3])', [3, 2, 1])
+
+    def test_max_function(self):
+        self.leer('MAX(1, 3, 2)', 3)
+
+    def test_min_function(self):
+        self.leer('MIN(1, 3, 2)', 1)
+
+    def test_sum_function(self):
+        self.leer('SUM([1, 2, 3])', 6)
+
+    def test_length_function(self):
+        self.leer('LENGTH("Hello")', 5)
+
+    def test_append_function(self):
+        self.leer('APPEND([1, 2], 3)', [1, 2, 3])
+
+    def test_update_function(self):
+        self.leer('UPDATE({"a": 1}, "b", 2)', {"a": 1, "b": 2})
+
+    def test_remove_item_function(self):
+        self.leer('REMOVE_ITEM([1, 2, 3, 2, 3, 3], 3, 2)', [1, 2, 2, 3])
+
+    def test_access_function(self):
+        self.leer('ACCESS({"a": 1, "b": 2}, "b")', 2)
+
+    def test_if_function(self):
+        self.leer('IF(1 > 2, "Yes", "No")', "No")
+
+    def test_type_function(self):
+        self.leer('TYPE(5)', "Integer")
+
+    def test_is_type_function(self):
+        self.leer('IS_TYPE(5, "number")', True)
+
+    def test_try_function(self):
+        self.leer('TRY(1/0, "Division By Zero Error", "Infinity")', "Infinity")
+
+    def test_range_function(self):
+        self.leer('RANGE(1, 4)', [1, 2, 3])
+
+    def test_for_map_function(self):
+        self.leer('FOR([1, 2, 3], "item", "item * 2")', [2, 4, 6])
+
+    def test_raise_function(self):
+        self.leer(
+            'RAISE("Custom Error", "An error occurred")',
+            expected_type=ETS.CUSTOM,
+            expect_error=True,
+            error_message="An error occurred"
+        )

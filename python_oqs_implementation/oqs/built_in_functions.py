@@ -1,8 +1,16 @@
 import json
 from .constants.values import MAX_ARGS
-from .errors import (OQSInvalidArgumentQuantityError, OQSDivisionByZeroError, OQSTypeError)
-from .nodes import FunctionNode
-from .utils.shortcuts import get_oqs_type
+from .errors import (
+    OQSInvalidArgumentQuantityError,
+    OQSDivisionByZeroError,
+    OQSTypeError,
+    OQSFunctionEvaluationError,
+    OQSBaseError,
+    OQSCustomErrorParent,
+    ERROR_NAME_MAPPING
+)
+from .nodes import (FunctionNode, ASTNode)
+from .utils.shortcuts import (get_oqs_type, is_oqs_instance)
 
 
 def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | list | str | dict:
@@ -374,3 +382,118 @@ def bif_if(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
     if len(node.args) % 2 != 0:
         return interpreter.evaluate(node.args[-1])
     return None
+
+
+def bif_type(interpreter: 'OQSInterpreter', node: FunctionNode) -> str:
+    if len(node.args) != 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
+        )
+    argument: any = interpreter.evaluate(node.args[0])
+    return get_oqs_type(argument)
+
+
+def bif_is_type(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) != 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
+        )
+    value, expected_type = [interpreter.evaluate(arg) for arg in node.args]
+    if not isinstance(expected_type, str):
+        raise OQSTypeError(message=f"Second argument must be a String. Instead got '{get_oqs_type(expected_type)}'.")
+    return is_oqs_instance(value, expected_type)
+
+
+def bif_try(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
+    if len(node.args) < 3:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    if len(node.args) % 2 == 0:
+        raise OQSFunctionEvaluationError(
+            function_name=node.name, message=f"Expected an odd amount of input arguments. Instead got {len(node.args)}."
+        )
+    arguments: list[ASTNode] = node.args.copy()
+    primary_expression: ASTNode = arguments.pop(0)
+
+    try:
+        return interpreter.evaluate(primary_expression)
+    except OQSBaseError as error:
+        for i in range(0, len(arguments) - 1, 2):
+            exception: any = interpreter.evaluate(arguments[i])
+            if not isinstance(exception, str):
+                raise OQSTypeError(
+                    message=f"Even argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+                )
+            if exception in error.error_hierarchy:
+                return interpreter.evaluate(arguments[i + 1])
+        raise
+
+
+def bif_range(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[int]:
+    if not (1 < len(node.args) < 3):
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=3, actual=len(node.args)
+        )
+    start: int = 0
+    step: int = 1
+    stop: int = 1
+    if len(node.args) == 1:
+        stop: any = interpreter.evaluate(node.args[0])
+    elif len(node.args) == 2:
+        start, stop = [interpreter.evaluate(arg) for arg in node.args]
+    elif len(node.args) == 3:
+        start, stop, step = [interpreter.evaluate(arg) for arg in node.args]
+    if not isinstance(start, int):
+        raise OQSTypeError(message=f"start argument must be an Integer. Instead got '{get_oqs_type(expected_type)}'.")
+    elif not isinstance(stop, int):
+        raise OQSTypeError(message=f"stop argument must be an Integer. Instead got '{get_oqs_type(expected_type)}'.")
+    elif not isinstance(step, int):
+        raise OQSTypeError(message=f"step argument must be an Integer. Instead got '{get_oqs_type(expected_type)}'.")
+    return list(range(start, stop, step))
+
+
+def bif_for_or_map(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
+    if len(node.args) != 3:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=3, actual=len(node.args)
+        )
+    looping_list: any = interpreter.evaluate(node.args[0])
+    variable_name: any = interpreter.evaluate(node.args[1])
+    expression: ASTNode = node.args[3]
+    if not isinstance(looping_list, list):
+        raise OQSTypeError(message=f"list argument must be a List. Instead got '{get_oqs_type(expected_type)}'.")
+    elif not isinstance(variable_name, str):
+        raise OQSTypeError(
+            message=f"variable_name argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+        )
+    resulting_list: list[any] = []
+    for item in looping_list:
+        interpreter.variables[variable_name] = item
+        resulting_list.append(interpreter.evaluate(expression))
+    return resulting_list
+
+
+def bif_raise(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
+    if len(node.args) != 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
+        )
+    error_name, error_message = [interpreter.evaluate(arg) for arg in node.args]
+    if not isinstance(error_name, str):
+        raise OQSTypeError(
+            message=f"error_name argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+        )
+    elif not isinstance(error_message, str):
+        raise OQSTypeError(
+            message=f"error_message argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+        )
+    if error_name in ERROR_NAME_MAPPING:
+        raise ERROR_NAME_MAPPING[error_name](message=error_message)
+    else:
+        class CustomError(OQSCustomErrorParent):
+            READABLE_NAME: str = error_name
+
+            def __init__(self):
+                super().__init__(message=error_message)
+        raise CustomError()

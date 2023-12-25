@@ -1,6 +1,7 @@
 class ValueTypeStrings:
     INTEGER: str = "Integer"
     DECIMAL: str = "Decimal"
+    NUMBER: str = "Number"
     STRING: str = "String"
     LIST: str = "List"
     KVS: str = "KVS"
@@ -20,3 +21,4 @@ class ErrorTypeStrings:
     DIVISION_BY_ZERO: str = "Division By Zero Error"
     UNEXPECTED_CHARACTER: str = "Unexpected Character Error"
     MISSING_EXPECTED_CHARACTER: str = "Missing Expected Character Error"
+    CUSTOM: str = "Custom Error"

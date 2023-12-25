@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.4
+## Version: 0.5
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -319,6 +319,59 @@ Interactions between types are explicitly defined within `OQS` as follows:
     - **Amount**: A minimum of two arguments up to an unlimited amount.
     - **Types**: Alternating between conditions (any type evaluated for truthiness) and results (any type).
   - **Outputs**: The result corresponding to the first true condition or the `else` result.
+- `TYPE(argument)` - Determines the type of the given argument:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: Any single type.
+  - **Outputs**: A `String` representing the type of the argument, such as "number", "integer", "decimal", "boolean", "list", "string", "function", "null", or "kvs".
+  - **Examples**:
+    - **Input**: `TYPE(5)` **Output**: `"integer"`
+    - **Input**: `TYPE([1, 2, 3])` **Output**: `"list"`
+- `IS_TYPE(argument, type_string)` - Evaluates whether the argument's type matches the specified type string:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: First input of any type, second input a `String`.
+    - **Case Insensitivity**: The `type_string` input is case-insensitive.
+  - **Outputs**: A `Boolean` indicating the type match.
+  - **Superiority Rules**: Types "integer" and "decimal" are considered subtypes of "number". An argument matching "integer" or "decimal" also returns `true` for "number".
+  - **Examples**:
+    - **Input**: `IS_TYPE(5, "number")` **Output**: `true`
+    - **Input**: `IS_TYPE("hello", "string")` **Output**: `true`
+- `TRY(expression, error_type1, result1, ..., error_typeN, resultN)` - Attempts to evaluate an expression and handles specific errors with corresponding fallback expressions:
+  - **Inputs**:
+    - **Amount**: Minimum of three, odd number, no maximum.
+    - **Types**: The first input is an expression of any type, followed by alternating `String` error types and their corresponding expressions.
+    - **Case Insensitivity**: The `error_type` inputs are case-insensitive.
+    - **Superiority Rules**: Error types follow a hierarchy, with specific error types taking precedence over general ones.
+  - **Outputs**: The result of the first expression if no error occurs, or the result of the corresponding expression for the first true matching error.
+  - **Examples**:
+    - **Input**: `TRY(1/0, "Division By Zero Error", "Infinity", "Syntax Error", "Check expression")` **Output**: `"Infinity"`
+- `RANGE(start, stop, step)` - Generates a list of integers starting from `start`, ending before `stop`, incrementing by `step`:
+  - **Inputs**:
+    - **Amount**: Between 1 and 3, all integers.
+    - **Defaults**: If only one argument is provided, it is considered as `stop` with `start` defaulting to 0 and `step` defaulting to 1.
+  - **Outputs**: A `List` of integers.
+  - **Examples**:
+    - **Input**: `RANGE(3)` **Output**: `[0, 1, 2]`
+    - **Input**: `RANGE(1, 3)` **Output**: `[1, 2]`
+    - **Input**: `RANGE(2, 10, 2)` **Output**: `[2, 4, 6, 8]`
+- `FOR(list, variable_name, expression)` / `MAP(list, variable_name, expression)`- Iterates over each item in a list, executing an expression for each item:
+  - **Inputs**:
+    - **Amount**: Exactly three inputs.
+    - **Types**: First input must be a `List`, second a `String` for the variable name that will be set to the current item from the list, and third an expression.
+    - **Variable**: During each iteration, the variable with the name set in the second argument is set to the current item from the list.
+  - **Outputs**: A `List` of the results from evaluating the expression for each list item.
+  - **Examples**:
+    - **Input**: `FOR([1, 2, 3], FOR_LIST_ITEM * 2)` **Output**: `[2, 4, 6]`
+- `RAISE(error_name, error_message)` - Triggers a specified error or creates a custom error:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs, both `String`.
+    - **Types**: First input for the error name, second for the error message.
+    - **Custom Error Handling**: If `error_name` is not a predefined error, a custom error with that name is raised.
+  - **Outputs**: Raises the specified error.
+  - **Examples**:
+    - **Input**: `RAISE("Syntax Error", "Invalid syntax")` **Output**: Raises a Syntax Error with the message "Invalid syntax".
+    - **Input**: `RAISE("NewError", "Custom error occurred")` **Output**: Raises a custom error named "NewError" with the message "Custom error occurred".
 
 
 ### Case Sensitivity
