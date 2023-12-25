@@ -21,17 +21,16 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: Change to package directory
-        run: cd python_oqs_implementation
-      - name: Install pypa/build
-        run: python3 -m pip install build --user
-      - name: Build a binary wheel and a source tarball
-        run: python3 -m build
+      - name: Install pypa/build and Build package
+        run: |
+          cd python_oqs_implementation
+          python3 -m pip install build --user
+          python3 -m build
       - name: Store the distribution packages
         uses: actions/upload-artifact@v3
         with:
           name: python-package-distributions
-          path: dist/
+          path: python_oqs_implementation/dist/
 
   publish-to-pypi:
     name: Publish Python 🐍 distribution 📦 to PyPI
