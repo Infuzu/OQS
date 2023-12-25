@@ -1819,7 +1819,7 @@
         "test_for_map_function": [
             {
                 "input": {
-                    "expression": "FOR([1, 2, 3], \"item\", \"item * 2\")",
+                    "expression": "FOR([1, 2, 3], \"item\", item * 2)",
                     "variables": null,
                     "string_embedded": false
                 },

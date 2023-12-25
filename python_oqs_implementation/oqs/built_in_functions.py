@@ -112,7 +112,9 @@ def bif_exponentiate(interpreter: 'OQSInterpreter', node: FunctionNode) -> int |
     if isinstance(base, (int, float)) and isinstance(exponent, (int, float)):
         return pow(base, exponent)
     else:
-        raise OQSTypeError(message=f"Cannot exponentiate type '{get_oqs_type(a)}' by type '{get_oqs_type(b)}'.")
+        raise OQSTypeError(
+            message=f"Cannot exponentiate type '{get_oqs_type(base)}' by type '{get_oqs_type(exponent)}'."
+        )
 
 
 def bif_modulo(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
@@ -423,7 +425,7 @@ def bif_try(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
             exception: any = interpreter.evaluate(arguments[i])
             if not isinstance(exception, str):
                 raise OQSTypeError(
-                    message=f"Even argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+                    message=f"Even argument must be a String. Instead got '{get_oqs_type(exception)}'."
                 )
             if exception in error.error_hierarchy:
                 return interpreter.evaluate(arguments[i + 1])
@@ -445,11 +447,11 @@ def bif_range(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[int]:
     elif len(node.args) == 3:
         start, stop, step = [interpreter.evaluate(arg) for arg in node.args]
     if not isinstance(start, int):
-        raise OQSTypeError(message=f"start argument must be an Integer. Instead got '{get_oqs_type(expected_type)}'.")
+        raise OQSTypeError(message=f"start argument must be an Integer. Instead got '{get_oqs_type(start)}'.")
     elif not isinstance(stop, int):
-        raise OQSTypeError(message=f"stop argument must be an Integer. Instead got '{get_oqs_type(expected_type)}'.")
+        raise OQSTypeError(message=f"stop argument must be an Integer. Instead got '{get_oqs_type(stop)}'.")
     elif not isinstance(step, int):
-        raise OQSTypeError(message=f"step argument must be an Integer. Instead got '{get_oqs_type(expected_type)}'.")
+        raise OQSTypeError(message=f"step argument must be an Integer. Instead got '{get_oqs_type(step)}'.")
     return list(range(start, stop, step))
 
 
@@ -460,17 +462,19 @@ def bif_for_or_map(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[an
         )
     looping_list: any = interpreter.evaluate(node.args[0])
     variable_name: any = interpreter.evaluate(node.args[1])
-    expression: ASTNode = node.args[3]
+    expression: ASTNode = node.args[2]
     if not isinstance(looping_list, list):
-        raise OQSTypeError(message=f"list argument must be a List. Instead got '{get_oqs_type(expected_type)}'.")
+        raise OQSTypeError(message=f"list argument must be a List. Instead got '{get_oqs_type(looping_list)}'.")
     elif not isinstance(variable_name, str):
         raise OQSTypeError(
-            message=f"variable_name argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+            message=f"variable_name argument must be a String. Instead got '{get_oqs_type(variable_name)}'."
         )
     resulting_list: list[any] = []
     for item in looping_list:
         interpreter.variables[variable_name] = item
-        resulting_list.append(interpreter.evaluate(expression))
+        evaluated_expression: any = interpreter.evaluate(expression)
+        resulting_list.append(evaluated_expression)
+
     return resulting_list
 
 
@@ -482,11 +486,11 @@ def bif_raise(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
     error_name, error_message = [interpreter.evaluate(arg) for arg in node.args]
     if not isinstance(error_name, str):
         raise OQSTypeError(
-            message=f"error_name argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+            message=f"error_name argument must be a String. Instead got '{get_oqs_type(error_name)}'."
         )
     elif not isinstance(error_message, str):
         raise OQSTypeError(
-            message=f"error_message argument must be a String. Instead got '{get_oqs_type(expected_type)}'."
+            message=f"error_message argument must be a String. Instead got '{get_oqs_type(error_message)}'."
         )
     if error_name in ERROR_NAME_MAPPING:
         raise ERROR_NAME_MAPPING[error_name](message=error_message)

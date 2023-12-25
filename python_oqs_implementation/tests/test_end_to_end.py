@@ -397,7 +397,7 @@ class TestOQSFunctions(unittest.TestCase):
         self.leer('RANGE(1, 4)', [1, 2, 3])
 
     def test_for_map_function(self):
-        self.leer('FOR([1, 2, 3], "item", "item * 2")', [2, 4, 6])
+        self.leer('FOR([1, 2, 3], "item", item * 2)', [2, 4, 6])
 
     def test_raise_function(self):
         self.leer(

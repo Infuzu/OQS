@@ -6,7 +6,7 @@ from tests.cases import generate_tests_json
 def main():
     generate_tests_json()
     def expression(iteration: int = 1) -> str:
-        return 'SUM([' + '       EXPONENTIATE(ADD(6, EXPONENTIATE(7, 3)), MULTIPLY(8, DECIMAL(9))), ' * 1000 + '])'
+        return 'RAISE("Custom Error", "An error occurred")'
     variables: dict[str, any] = {}
     string_embedded: bool = False
     for i in range(1):
