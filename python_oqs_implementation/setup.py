@@ -3,7 +3,7 @@ from setuptools import (setup, find_packages)
 
 setup(
     name='oqs',
-    version='0.7.1',
+    version='0.8.1',
     packages=find_packages(include=['oqs', 'oqs.*']),
     description=
     "OQS (Open Quick Script) is a Python library for interpreting versatile expressions, supporting basic to advanced "

@@ -91,7 +91,12 @@ class OQSInterpreter:
         "RANGE": built_in_functions.bif_range,
         "FOR": built_in_functions.bif_for_or_map,
         "MAP": built_in_functions.bif_for_or_map,
-        "RAISE": built_in_functions.bif_raise
+        "RAISE": built_in_functions.bif_raise,
+        "FILTER": built_in_functions.bif_filter,
+        "SORT": built_in_functions.bif_sort,
+        "FLATTEN": built_in_functions.bif_flatten,
+        "SLICE": built_in_functions.bif_slice,
+        "IN": built_in_functions.bif_in
     }
 
     def __init__(self, expression: str, variables: dict[str, any] | None = None) -> None:

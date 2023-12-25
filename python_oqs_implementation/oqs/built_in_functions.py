@@ -732,3 +732,127 @@ def bif_raise(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
             def __init__(self):
                 super().__init__(message=error_message)
         raise CustomError()
+
+
+def bif_filter(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any] | dict[str, any]:
+    if len(node.args) != 3:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=3, actual=len(node.args)
+        )
+    collection, unevaluated_variable_name, predicate = node.args
+    collection_value: any = interpreter.evaluate(collection)
+    if not isinstance(collection_value, (list, dict)):
+        raise OQSTypeError(
+            message=f"FILTER function requires a List or KVS as the first argument. "
+                    f"Instead got '{get_oqs_type(collection_value)}'."
+        )
+    evaluated_variable_name: any = interpreter.evaluate(unevaluated_variable_name)
+    if not isinstance(evaluated_variable_name, str):
+        raise OQSTypeError(
+            message=f"FILTER function requires a String as the second argument. "
+                    f"Instead got '{get_oqs_type(evaluated_variable_name)}'. "
+        )
+    filtered_result: dict[str, any] | list[any] = collection_value.copy()
+    if isinstance(collection_value, list):
+        for item in collection_value:
+            interpreter.variables[evaluated_variable_name] = item
+            if not interpreter.evaluate(predicate):
+                filtered_result.remove(item)
+    else:
+        for key, value in collection_value.items():
+            interpreter.variables[evaluated_variable_name] = value
+            if not interpreter.evaluate(predicate):
+                del filtered_result[key]
+    return filtered_result
+
+
+def bif_sort(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
+    if len(node.args) < 3 or len(node.args) > 4:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=4, actual=len(node.args)
+        )
+    collection, unevaluated_variable_name, key_expression = node.args[:3]
+    descending: bool = interpreter.evaluate(node.args[3]) if len(node.args) == 4 else False
+
+    collection_value: any = interpreter.evaluate(collection)
+    if not isinstance(collection_value, list):
+        raise OQSTypeError(
+            message=f"SORT function requires a list as the first argument. "
+                    f"Instead got '{get_oqs_type(collection_value)}'. "
+        )
+
+    evaluated_variable_name: any = interpreter.evaluate(unevaluated_variable_name)
+    if not isinstance(evaluated_variable_name, str):
+        raise OQSTypeError(
+            message=f"SORT function requires a String as the second argument. "
+                    f"Instead got '{get_oqs_type(evaluated_variable_name)}'. "
+        )
+
+    def evaluate_expression_with_variable(item: any) -> any:
+        interpreter.variables[evaluated_variable_name] = item
+        return interpreter.evaluate(key_expression)
+
+    sorted_collection = sorted(collection_value, key=evaluate_expression_with_variable, reverse=descending)
+    return sorted_collection
+
+
+def bif_flatten(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
+    if len(node.args) != 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
+        )
+    list_to_flatten: any = interpreter.evaluate(node.args[0])
+    if not isinstance(list_to_flatten, list):
+        raise OQSTypeError(
+            message=f"FLATTEN function requires a list as the argument. Instead got '{get_oqs_type(list_to_flatten)}'. "
+        )
+
+    def flatten(lst):
+        result: list[any] = []
+        for i in lst:
+            if isinstance(i, list):
+                result.extend(flatten(i))
+            else:
+                result.append(i)
+        return result
+
+    return flatten(list_to_flatten)
+
+
+def bif_slice(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any] | str:
+    if len(node.args) < 2 or len(node.args) > 3:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=3, actual=len(node.args)
+        )
+    collection, start = [interpreter.evaluate(arg) for arg in node.args[:2]]
+    end: any = interpreter.evaluate(node.args[2]) if len(node.args) == 3 else None
+
+    if not isinstance(collection, (list, str)):
+        raise OQSTypeError(
+            message=f"SLICE function requires a List or String as the first argument. "
+                    f"Instead got '{get_oqs_type(collection)}'. "
+        )
+    if not isinstance(start, int) or (end is not None and not isinstance(end, int)):
+        raise OQSTypeError(
+            message=f"SLICE function requires Integer arguments for start and end positions. "
+                    f"Instead got '{get_oqs_type(start)}', '{get_oqs_type(end)}' respectively. "
+        )
+
+    return collection[start:end]
+
+
+def bif_in(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) != 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
+        )
+    value, collection = [interpreter.evaluate(arg) for arg in node.args]
+    if isinstance(collection, list):
+        return value in collection
+    elif isinstance(collection, dict):
+        return value in collection.keys()
+    else:
+        raise OQSTypeError(
+            message=f"IN function requires a list or KVS as the second argument. "
+                    f"Instead got '{get_oqs_type(collection)}'. "
+        )

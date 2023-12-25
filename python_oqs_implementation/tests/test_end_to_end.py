@@ -1,8 +1,5 @@
 import unittest
-from typing import Callable
-from python_oqs_implementation.oqs.engine import oqs_engine
 from python_oqs_implementation.oqs.constants.types import ErrorTypeStrings as ETS
-from python_oqs_implementation.oqs.utils.shortcuts import get_oqs_type
 from .utils import language_engine_expected_result
 
 
@@ -458,3 +455,40 @@ class TestOQSFunctions(unittest.TestCase):
             expect_error=True,
             error_message="An error occurred"
         )
+
+    def test_filter_list(self):
+        self.leer('FILTER([1, 2, 3, 4], "x", x > 2)', [3, 4])
+
+    def test_filter_kvs(self):
+        self.leer('FILTER({"a": 1, "b": 2, "c": 3}, "value", value == 2)', {"b": 2})
+
+    # Tests for the SORT function
+    def test_sort_list_ascending(self):
+        self.leer('SORT([4, 1, 3, 2], "x", x)', [1, 2, 3, 4])
+
+    def test_sort_list_descending(self):
+        self.leer('SORT([4, 1, 3, 2], "x", x, true)', [4, 3, 2, 1])
+
+    # Tests for the FLATTEN function
+    def test_flatten_list(self):
+        self.leer('FLATTEN([[1, 2], [3, 4], [5]])', [1, 2, 3, 4, 5])
+
+    # Tests for the SLICE function
+    def test_slice_list(self):
+        self.leer('SLICE([1, 2, 3, 4, 5], 1, 3)', [2, 3])
+
+    def test_slice_string(self):
+        self.leer('SLICE("Hello World", 0, 5)', "Hello")
+
+    # Tests for the IN function
+    def test_in_list(self):
+        self.leer('IN(3, [1, 2, 3, 4])', True)
+
+    def test_in_kvs(self):
+        self.leer('IN("b", {"a": 1, "b": 2, "c": 3})', True)
+
+    def test_not_in_list(self):
+        self.leer('IN("z", [1, 2, 3, 4])', False)
+
+    def test_not_in_kvs(self):
+        self.leer('IN("d", {"a": 1, "b": 2, "c": 3})', False)
