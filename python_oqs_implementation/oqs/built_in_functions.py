@@ -7,7 +7,7 @@ from .errors import (
     OQSFunctionEvaluationError,
     OQSBaseError,
     OQSCustomErrorParent,
-    ERROR_NAME_MAPPING
+    get_error_name_mapping
 )
 from .nodes import (FunctionNode, ASTNode)
 from .utils.shortcuts import (get_oqs_type, is_oqs_instance)
@@ -492,8 +492,9 @@ def bif_raise(interpreter: 'OQSInterpreter', node: FunctionNode) -> any:
         raise OQSTypeError(
             message=f"error_message argument must be a String. Instead got '{get_oqs_type(error_message)}'."
         )
-    if error_name in ERROR_NAME_MAPPING:
-        raise ERROR_NAME_MAPPING[error_name](message=error_message)
+    error_name_mapping: dict[str, type[OQSBaseError]] = get_error_name_mapping()
+    if error_name.upper() in error_name_mapping:
+        raise error_name_mapping[error_name.upper()](message=error_message)
     else:
         class CustomError(OQSCustomErrorParent):
             READABLE_NAME: str = error_name

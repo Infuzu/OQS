@@ -1,6 +1,8 @@
 from .constants.types import ErrorTypeStrings as ETS
 from abc import ABC
 
+from .utils.classes import find_non_abc_subclasses
+
 
 class OQSBaseError(Exception, ABC):
     def __init__(self, message: str = "An error occurred while evaluating your expression!") -> None:
@@ -94,13 +96,12 @@ class OQSCustomErrorParent(OQSBaseError, ABC):
         super().__init__(*args, **kwargs)
 
 
-ERROR_NAME_MAPPING: dict[str, type[OQSBaseError]] = {
-    ETS.INVALID_ARGUMENT_QUANTITY: OQSInvalidArgumentQuantityError,
-    ETS.SYNTAX: OQSSyntaxError,
-    ETS.TYPE: OQSTypeError,
-    ETS.UNDEFINED_VARIABLE: OQSUndefinedVariableError,
-    ETS.UNDEFINED_FUNCTION: OQSUndefinedFunctionError,
-    ETS.DIVISION_BY_ZERO: OQSDivisionByZeroError,
-    ETS.UNEXPECTED_CHARACTER: OQSUnexpectedCharacterError,
-    ETS.MISSING_EXPECTED_CHARACTER: OQSMissingExpectedCharacterError
-}
+def get_error_name_mapping() -> dict[str, type[OQSBaseError]]:
+    error_classes: list[type[OQSBaseError]] = find_non_abc_subclasses(OQSBaseError)
+    error_name_mapping: dict[str, type[OQSBaseError]] = {}
+    for cls in error_classes:
+        if hasattr(cls, "READABLE_NAME"):
+            error_name_mapping[cls.READABLE_NAME.upper()] = cls
+        else:
+            raise TypeError(f"Class {cls.__name__} does not have a 'READABLE_NAME' class attribute.")
+    return error_name_mapping
