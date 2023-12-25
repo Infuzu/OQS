@@ -1967,6 +1967,62 @@
                 }
             }
         ],
+        "test_filter_kvs": [
+            {
+                "input": {
+                    "expression": "FILTER({\"a\": 1, \"b\": 2, \"c\": 3}, \"value\", value == 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": {
+                            "b": 2
+                        },
+                        "type": "KVS"
+                    }
+                }
+            }
+        ],
+        "test_filter_list": [
+            {
+                "input": {
+                    "expression": "FILTER([1, 2, 3, 4], \"x\", x > 2)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            3,
+                            4
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_flatten_list": [
+            {
+                "input": {
+                    "expression": "FLATTEN([[1, 2], [3, 4], [5]])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
         "test_for_map_function": [
             {
                 "input": {
@@ -2053,6 +2109,36 @@
                     "results": {
                         "value": "No",
                         "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_in_kvs": [
+            {
+                "input": {
+                    "expression": "IN(\"b\", {\"a\": 1, \"b\": 2, \"c\": 3})",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_in_list": [
+            {
+                "input": {
+                    "expression": "IN(3, [1, 2, 3, 4])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
                     }
                 }
             }
@@ -2279,6 +2365,36 @@
                 }
             }
         ],
+        "test_not_in_kvs": [
+            {
+                "input": {
+                    "expression": "IN(\"d\", {\"a\": 1, \"b\": 2, \"c\": 3})",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_not_in_list": [
+            {
+                "input": {
+                    "expression": "IN(\"z\", [1, 2, 3, 4])",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
         "test_or_function": [
             {
                 "input": {
@@ -2384,6 +2500,79 @@
                 "output": {
                     "results": {
                         "value": [
+                            3,
+                            2,
+                            1
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_slice_list": [
+            {
+                "input": {
+                    "expression": "SLICE([1, 2, 3, 4, 5], 1, 3)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            2,
+                            3
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_slice_string": [
+            {
+                "input": {
+                    "expression": "SLICE(\"Hello World\", 0, 5)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "Hello",
+                        "type": "String"
+                    }
+                }
+            }
+        ],
+        "test_sort_list_ascending": [
+            {
+                "input": {
+                    "expression": "SORT([4, 1, 3, 2], \"x\", x)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            1,
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_sort_list_descending": [
+            {
+                "input": {
+                    "expression": "SORT([4, 1, 3, 2], \"x\", x, true)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": [
+                            4,
                             3,
                             2,
                             1
