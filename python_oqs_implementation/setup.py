@@ -20,7 +20,6 @@ setup(
     license='Creative Commons Attribution 4.0 International License',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: Creative Commons Attribution 4.0 International License',
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.10',
