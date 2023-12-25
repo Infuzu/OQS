@@ -115,6 +115,62 @@ else:
     - **Amount**: Exactly two inputs.
     - **Types**: Both inputs must be `Number`.
   - **Outputs**: `Number`.
+- `LESS_THAN(argument1, argument2, ...)` - Compares if each preceding argument is less than its following argument:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: All inputs must be `Number`.
+  - **Outputs**: `Boolean` - Returns `true` if each argument is less than the next one, otherwise `false`.
+- `GREATER_THAN(argument1, argument2, ...)` - Compares if each preceding argument is greater than its following argument:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: All inputs must be `Number`.
+  - **Outputs**: `Boolean` - Returns `true` if each argument is greater than the next one, otherwise `false`.
+- `LESS_THAN_OR_EQUAL(argument1, argument2, ...)` - Compares if each preceding argument is less than or equal to its following argument:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: All inputs must be `Number`.
+  - **Outputs**: `Boolean` - Returns `true` if each argument is less than or equal to the next one, otherwise `false`.
+- `GREATER_THAN_OR_EQUAL(argument1, argument2, ...)` - Compares if each preceding argument is greater than or equal to its following argument:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: All inputs must be `Number`.
+  - **Outputs**: `Boolean` - Returns `true` if each argument is greater than or equal to the next one, otherwise `false`.
+- `EQUALS(argument1, argument2, ...)` - Compares if all arguments are equal:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, but all must be of the same type.
+  - **Outputs**: `Boolean` - Returns `true` if all arguments are equal, otherwise `false`.
+- `NOT_EQUALS(argument1, argument2, ...)` - Compares if any of the arguments are not equal:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, but all must be of the same type.
+  - **Outputs**: `Boolean` - Returns `true` if any argument is not equal to the others, otherwise `false`.
+- `STRICTLY_EQUALS(argument1, argument2, ...)` - Compares if all arguments are strictly equal (identical in type and value):
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, but all must be of the same type.
+  - **Outputs**: `Boolean` - Returns `true` if all arguments are strictly equal, otherwise `false`.
+- `STRICTLY_NOT_EQUALS(argument1, argument2, ...)` - Compares if any of the arguments are strictly not equal (different in type or value):
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, but all must be of the same type.
+  - **Outputs**: `Boolean` - Returns `true` if any argument is strictly not equal to the others, otherwise `false`.
+- `AND(argument1, argument2, ...)` - Performs a logical AND operation on all provided arguments:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, evaluated for their truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if all arguments are truthy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `AND(true, 1, "text")` **Output**: `true`
+    - **Input**: `AND(true, 0)` **Output**: `false`
+- `OR(argument1, argument2, ...)` - Performs a logical OR operation on all provided arguments:
+  - **Inputs**:
+    - **Amount**: Two or more inputs.
+    - **Types**: Any types, evaluated for their truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if at least one argument is truthy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `OR(false, 0, null, "text")` **Output**: `true`
+    - **Input**: `OR(false, 0, "")` **Output**: `false`
 - `INTEGER(argument)` - Converts to an integer representation:
   - **Inputs**:
     - **Amount**: Exactly one input.
@@ -146,22 +202,6 @@ else:
     - **Amount**: Exactly one input.
     - **Types**: Any single type.
   - **Outputs**: `Boolean`.Great! To include the `AND` and `OR` functions in the `OQS` language guidelines, we can expand the "Built-in Functions" section. These functions will provide an alternative way to perform logical operations, particularly useful for handling multiple operands or integrating into more complex expressions.
-- `AND(argument1, argument2, ...)` - Performs a logical AND operation on all provided arguments:
-  - **Inputs**:
-    - **Amount**: Two or more inputs.
-    - **Types**: Any types, evaluated for their truthiness.
-  - **Outputs**: `Boolean` - Returns `true` if all arguments are truthy, otherwise `false`.
-  - **Examples**:
-    - **Input**: `AND(true, 1, "text")` **Output**: `true`
-    - **Input**: `AND(true, 0)` **Output**: `false`
-- `OR(argument1, argument2, ...)` - Performs a logical OR operation on all provided arguments:
-  - **Inputs**:
-    - **Amount**: Two or more inputs.
-    - **Types**: Any types, evaluated for their truthiness.
-  - **Outputs**: `Boolean` - Returns `true` if at least one argument is truthy, otherwise `false`.
-  - **Examples**:
-    - **Input**: `OR(false, 0, null, "text")` **Output**: `true`
-    - **Input**: `OR(false, 0, "")` **Output**: `false`
 - `KEYS(kvs)` - Retrieves a list of all keys in a KVS:
   - **Inputs**:
     - **Amount**: Exactly one input.

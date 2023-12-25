@@ -29,7 +29,22 @@ from .parser import OQSParser
 
 class OQSInterpreter:
     OPERATORS: dict[str, str] = {
-        '+': "ADD", '-': "SUBTRACT", '*': "MULTIPLY", '/': "DIVIDE", '%': "MODULO", '**': "EXPONENTIATE"
+        '+': "ADD",
+        '-': "SUBTRACT",
+        '*': "MULTIPLY",
+        '/': "DIVIDE",
+        '%': "MODULO",
+        '**': "EXPONENTIATE",
+        '<': "LESS_THAN",
+        '>': "GREATER_THAN",
+        '<=': "LESS_THAN_OR_EQUAL",
+        '>=': "GREATER_THAN_OR_EQUAL",
+        '==': "EQUALS",
+        '!=': "NOT_EQUALS",
+        '===': "STRICTLY_EQUALS",
+        '!==': "STRICTLY_NOT_EQUALS",
+        '&': "AND",
+        '|': "OR"
     }
     FUNCTIONS: dict[str, Callable] = {
         "ADD": built_in_functions.bif_add,
@@ -38,6 +53,16 @@ class OQSInterpreter:
         "DIVIDE": built_in_functions.bif_divide,
         "EXPONENTIATE": built_in_functions.bif_exponentiate,
         "MODULO": built_in_functions.bif_modulo,
+        "LESS_THAN": built_in_functions.bif_less_than,
+        "GREATER_THAN": built_in_functions.bif_greater_than,
+        "LESS_THAN_OR_EQUAL": built_in_functions.bif_less_than_or_equal,
+        "GREATER_THAN_OR_EQUAL": built_in_functions.bif_greater_than_or_equal,
+        "EQUALS": built_in_functions.bif_equals,
+        "NOT_EQUALS": built_in_functions.bif_not_equals,
+        "STRICTLY_EQUALS": built_in_functions.bif_strictly_equals,
+        "STRICTLY_NOT_EQUALS": built_in_functions.bif_strictly_not_equals,
+        "AND": built_in_functions.bif_and,
+        "OR": built_in_functions.bif_or,
         "INTEGER": built_in_functions.bif_integer,
         "DECIMAL": built_in_functions.bif_decimal,
         "STRING": built_in_functions.bif_string,
@@ -45,8 +70,6 @@ class OQSInterpreter:
         "KVS": built_in_functions.bif_kvs,
         "BOOLEAN": built_in_functions.bif_boolean,
         "BOOL": built_in_functions.bif_boolean,
-        "AND": built_in_functions.bif_and,
-        "OR": built_in_functions.bif_or,
         "KEYS": built_in_functions.bif_keys,
         "VALUES": built_in_functions.bif_values,
         "UNIQUE": built_in_functions.bif_unique,
@@ -119,29 +142,9 @@ class OQSInterpreter:
             else:
                 raise OQSSyntaxError(f"Invalid binary operator '{node.op}'")
         elif isinstance(node, ComparisonOpNode):
-            left: any = self.evaluate(node.left)
-            right: any = self.evaluate(node.right)
-
-            if node.op == '==':
-                return left == right
-            elif node.op == '!=':
-                return left != right
-            elif node.op == '<':
-                return left < right
-            elif node.op == '<=':
-                return left <= right
-            elif node.op == '>':
-                return left > right
-            elif node.op == '>=':
-                return left >= right
-            elif node.op == '===':
-                return type(left) == type(right) and left == right
-            elif node.op == '!==':
-                return type(left) != type(right) or left != right
-            elif node.op == '&':
-                return bool(left) and bool(right)
-            elif node.op == '|':
-                return bool(left) or bool(right)
+            if node.op in self.OPERATORS:
+                function_node: FunctionNode = FunctionNode(name=self.OPERATORS[node.op], args=[node.left, node.right])
+                return self.FUNCTIONS[function_node.name](self, function_node)
             else:
                 raise OQSSyntaxError(f"Invalid comparison operator '{node.op}'")
         elif isinstance(node, FunctionNode):

@@ -128,6 +128,236 @@ def bif_modulo(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
     return a % b
 
 
+def bif_less_than(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                if not left < right:
+                    return False
+            else:
+                raise OQSTypeError(
+                    message=f"Cannot evaluated if type '{get_oqs_type(left)}' is less than "
+                            f"type '{get_oqs_type(right)}'."
+                )
+    return True
+
+
+def bif_greater_than(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                if not left > right:
+                    return False
+            else:
+                raise OQSTypeError(
+                    message=f"Cannot evaluated if type '{get_oqs_type(left)}' is greater than "
+                            f"type '{get_oqs_type(right)}'."
+                )
+    return True
+
+
+def bif_less_than_or_equal(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                if not left <= right:
+                    return False
+            else:
+                raise OQSTypeError(
+                    message=f"Cannot evaluated if type '{get_oqs_type(left)}' is less than or equal to "
+                            f"type '{get_oqs_type(right)}'."
+                )
+    return True
+
+
+def bif_greater_than_or_equal(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                if not left >= right:
+                    return False
+            else:
+                raise OQSTypeError(
+                    message=f"Cannot evaluated if type '{get_oqs_type(left)}' is greater than or equal to "
+                            f"type '{get_oqs_type(right)}'."
+                )
+    return True
+
+
+def bif_equals(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if not left == right:
+                return False
+    return True
+
+
+def bif_not_equals(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if not left != right:
+                return False
+    return True
+
+
+def bif_strictly_equals(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if not (left == right and type(left) == type(right)):
+                return False
+    return True
+
+
+def bif_strictly_not_equals(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
+    if len(node.args) < 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    evaluated_args: dict[int, any] = {}
+    for i, arg in enumerate(node.args):
+        if len(node.args) > i + 1:
+            if i in evaluated_args:
+                left: any = evaluated_args[i]
+            else:
+                left: any = interpreter.evaluate(node.args[i])
+                evaluated_args[i] = left
+            if i + 1 in evaluated_args:
+                right: any = evaluated_args[i + 1]
+            else:
+                right: any = interpreter.evaluate(node.args[i + 1])
+                evaluated_args[i + 1] = right
+            if not (left != right or type(left) != type(right)):
+                return False
+    return True
+
+
+def bif_and(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) < 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    for arg in node.args:
+        if not interpreter.evaluate(arg):
+            return False
+    return True
+
+
+def bif_or(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) < 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
+        )
+    for arg in node.args:
+        if interpreter.evaluate(arg):
+            return True
+    return False
+
+
 def bif_integer(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(
@@ -185,28 +415,6 @@ def bif_boolean(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
         )
     value: any = interpreter.evaluate(node.args[0])
     return bool(value)
-
-
-def bif_and(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
-    if len(node.args) < 1:
-        raise OQSInvalidArgumentQuantityError(
-            function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
-        )
-    for arg in node.args:
-        if not interpreter.evaluate(arg):
-            return False
-    return True
-
-
-def bif_or(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
-    if len(node.args) < 1:
-        raise OQSInvalidArgumentQuantityError(
-            function_name=node.name, expected_min=1, expected_max=MAX_ARGS, actual=len(node.args)
-        )
-    for arg in node.args:
-        if interpreter.evaluate(arg):
-            return True
-    return False
 
 
 def bif_keys(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[str]:

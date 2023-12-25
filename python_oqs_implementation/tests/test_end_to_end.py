@@ -343,6 +343,38 @@ class TestOQSFunctions(unittest.TestCase):
     def test_modulo(self):
         self.leer('MODULO(10, 3)', 1)
 
+    def test_less_than(self):
+        self.leer('LESS_THAN(1, 2, 3)', True)
+        self.leer('LESS_THAN(1, 3, 2)', False)
+
+    def test_greater_than(self):
+        self.leer('GREATER_THAN(3, 2, 1)', True)
+        self.leer('GREATER_THAN(3, 1, 2)', False)
+
+    def test_less_than_or_equal(self):
+        self.leer('LESS_THAN_OR_EQUAL(1, 2, 2)', True)
+        self.leer('LESS_THAN_OR_EQUAL(2, 2, 1)', False)
+
+    def test_greater_than_or_equal(self):
+        self.leer('GREATER_THAN_OR_EQUAL(3, 2, 2)', True)
+        self.leer('GREATER_THAN_OR_EQUAL(2, 2, 3)', False)
+
+    def test_equals(self):
+        self.leer('EQUALS(2, 2, 2)', True)
+        self.leer('EQUALS(2, 2, 3)', False)
+
+    def test_not_equals(self):
+        self.leer('NOT_EQUALS(2, 3, 4)', True)
+        self.leer('NOT_EQUALS(2, 2, 2)', False)
+
+    def test_strictly_equals(self):
+        self.leer('STRICTLY_EQUALS("2", "2", "2")', True)
+        self.leer('STRICTLY_EQUALS("2", "2", 2)', False)
+
+    def test_strictly_not_equals(self):
+        self.leer('STRICTLY_NOT_EQUALS("2", "3", 2)', True)
+        self.leer('STRICTLY_NOT_EQUALS("2", "2", "2")', False)
+
     def test_integer_conversion(self):
         self.leer('INTEGER(3.5)', 3)
 
