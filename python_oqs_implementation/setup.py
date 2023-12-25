@@ -6,12 +6,11 @@ setup(
     version='0.4.1',
     packages=find_packages(include=['oqs', 'oqs.*']),
     description=
-    "OQS (Open Quick Script) is a Python implementation of a versatile expression language optimized for processing "
-    "fundamental types and operations. It allows for interpreting expressions, optionally with variables in the form "
-    "of dictionaries, maps, or JSON, to deliver consistent and logical results. Adhering to the OQS Specification, "
-    "this implementation supports a variety of features including basic and advanced operations, custom functions, "
-    "performance monitoring, and extensive error handling. Ideal for a wide range of applications, OQS simplifies "
-    "expression evaluation and enhances Python's computational capabilities.",
+    "OQS (Open Quick Script) is a Python library for interpreting versatile expressions, supporting basic to advanced "
+    "operations, custom functions, and performance monitoring. It efficiently handles fundamental types and "
+    "operations, interprets expressions using variables from dictionaries or JSON, and adheres to robust error "
+    "handling standards. OQS enhances Python's expression evaluation capabilities, making it ideal for diverse "
+    "applications.",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     author='Infuzu',
