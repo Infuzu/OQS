@@ -1,9 +1,13 @@
 from setuptools import (setup, find_packages)
 
 
+with open('python_oqs_implementation/requirements.txt') as f:
+    requirements = f.read().splitlines()
+
+
 setup(
     name='oqs',
-    version='0.9.1',
+    version='0.10.1',
     packages=find_packages(include=['oqs', 'oqs.*']),
     description=
     "OQS (Open Quick Script) is a Python library for interpreting versatile expressions, supporting basic to advanced "
@@ -22,5 +26,6 @@ setup(
         'Operating System :: OS Independent',
     ],
     python_requires='>=3.10',
-    license_files=('../LICENSE.md',)
+    license_files=('../LICENSE.md',),
+    install_requires=requirements
 )

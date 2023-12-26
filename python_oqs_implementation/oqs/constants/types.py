@@ -7,6 +7,11 @@ class ValueTypeStrings:
     KVS: str = "KVS"
     BOOLEAN: str = "Boolean"
     NULL: str = "Null"
+    TEMPORAL: str = "Temporal"
+    DATETIME: str = "DateTime"
+    DATE: str = "Date"
+    TIME: str = "Time"
+    DURATION: str = "Duration"
     UNKNOWN: str = "Unknown"
 
 
@@ -15,6 +20,7 @@ class ErrorTypeStrings:
     INVALID_ARGUMENT_QUANTITY: str = "Invalid Argument Quantity Error"
     SYNTAX: str = "Syntax Error"
     TYPE: str = "Type Error"
+    VALUE: str = "Value Error"
     UNDEFINED_VARIABLE: str = "Undefined Variable Error"
     UNDEFINED_FUNCTION: str = "Undefined Function Error"
     FUNCTION_EVALUATION: str = "Function Evaluation Error"

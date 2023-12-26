@@ -97,7 +97,18 @@ class OQSInterpreter:
         "SORT": built_in_functions.bif_sort,
         "FLATTEN": built_in_functions.bif_flatten,
         "SLICE": built_in_functions.bif_slice,
-        "IN": built_in_functions.bif_in
+        "IN": built_in_functions.bif_in,
+        "DATE": built_in_functions.bif_date,
+        "TIME": built_in_functions.bif_time,
+        "DATETIME": built_in_functions.bif_datetime,
+        "DURATION": built_in_functions.bif_duration,
+        "NOW": built_in_functions.bif_now,
+        "TODAY": built_in_functions.bif_today,
+        "TIME_NOW": built_in_functions.bif_time_now,
+        "PARSE_TEMPORAL": built_in_functions.bif_parse_temporal,
+        "FORMAT_TEMPORAL": built_in_functions.bif_format_temporal,
+        "EXTRACT_DATE": built_in_functions.bif_date,
+        "EXTRACT_TIME": built_in_functions.bif_time
     }
 
     def __init__(self, expression: str, variables: dict[str, any] | None = None) -> None:

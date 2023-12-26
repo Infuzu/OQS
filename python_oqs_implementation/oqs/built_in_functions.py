@@ -1,4 +1,6 @@
+import datetime
 import json
+import re
 from .constants.values import MAX_ARGS
 from .errors import (
     OQSInvalidArgumentQuantityError,
@@ -7,13 +9,17 @@ from .errors import (
     OQSFunctionEvaluationError,
     OQSBaseError,
     OQSCustomErrorParent,
+    OQSValueError,
     get_error_name_mapping
 )
 from .nodes import (FunctionNode, ASTNode)
+from .utils.conversion import OQSJSONEncoder
 from .utils.shortcuts import (get_oqs_type, is_oqs_instance)
 
 
-def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | list | str | dict:
+def bif_add(
+        interpreter: 'OQSInterpreter', node: FunctionNode
+) -> int | float | list | str | dict | datetime.datetime | datetime.date | datetime.time | datetime.timedelta:
     if len(node.args) < 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=MAX_ARGS, actual=len(node.args)
@@ -30,12 +36,36 @@ def bif_add(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | 
         elif isinstance(completion, dict) and isinstance(evaluated_arg, dict):
             for key, value in evaluated_arg.items():
                 completion[key] = value
+        elif (
+            isinstance(completion, datetime.datetime) and isinstance(evaluated_arg, datetime.timedelta)
+        ) or (
+            isinstance(completion, datetime.date) and isinstance(evaluated_arg, datetime.timedelta)
+        ) or (
+            isinstance(completion, datetime.timedelta) and isinstance(
+                evaluated_arg, (datetime.datetime, datetime.date, datetime.timedelta)
+            )
+        ):
+            completion += evaluated_arg
+        elif (
+            isinstance(completion, datetime.time) and isinstance(evaluated_arg, datetime.timedelta)
+        ) or (
+            isinstance(completion, datetime.timedelta) and isinstance(evaluated_arg, datetime.time)
+        ):
+            completion, evaluated_arg = (completion, evaluated_arg) if isinstance(
+                completion, datetime.time
+            ) else (evaluated_arg, completion)
+            time_seconds: int = (completion.hour * 3600) + (completion.minute * 60) + completion.second
+            total_seconds: int = time_seconds + evaluated_arg.seconds
+            new_time: datetime.time = (datetime.datetime.min + datetime.timedelta(seconds=total_seconds)).time()
+            completion: daetime.time = new_time
         else:
             raise OQSTypeError(message=f"Cannot add '{get_oqs_type(completion)}' and '{get_oqs_type(evaluated_arg)}'")
     return completion
 
 
-def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | float | list | str:
+def bif_subtract(
+        interpreter: 'OQSInterpreter', node: FunctionNode
+) -> int | float | list | str | datetime.datetime | datetime.date | datetime.time | datetime.timedelta:
     if len(node.args) != 2:
         raise OQSInvalidArgumentQuantityError(
             function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
@@ -47,6 +77,23 @@ def bif_subtract(interpreter: 'OQSInterpreter', node: FunctionNode) -> int | flo
         return [item for item in a if item not in b]
     elif isinstance(a, str) and isinstance(b, str):
         return a.replace(b, '')
+    elif isinstance(a, datetime.datetime) and isinstance(b, datetime.timedelta):
+        return a - b
+    elif isinstance(a, datetime.date) and isinstance(b, datetime.timedelta):
+        return a - b
+    elif isinstance(a, datetime.time) and isinstance(b, datetime.timedelta):
+        time_seconds_a: int = (a.hour * 3600) + (a.minute * 60) + a.second
+        total_seconds: int = time_seconds_a - b.seconds
+        if total_seconds < 0:
+            raise OQSValueError(message="Resulting time is negative, which is not supported for datetime.time objects.")
+        new_time: datetime.time = (datetime.datetime.min + datetime.timedelta(seconds=total_seconds)).time()
+        return new_time
+    elif isinstance(a, datetime.timedelta) and isinstance(b, datetime.timedelta):
+        return a - b
+    elif isinstance(a, datetime.datetime) and isinstance(b, datetime.datetime):
+        return a - b
+    elif isinstance(a, datetime.date) and isinstance(b, datetime.date):
+        return a - b
     else:
         raise OQSTypeError(message=f"Cannot subtract '{get_oqs_type(a)}' by '{get_oqs_type(b)}'")
 
@@ -146,7 +193,17 @@ def bif_less_than(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
             else:
                 right: any = interpreter.evaluate(node.args[i + 1])
                 evaluated_args[i + 1] = right
-            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            if (
+                isinstance(left, (int, float)) and isinstance(right, (int, float))
+            ) or (
+                isinstance(left, datetime.datetime) and isinstance(right, datetime.datetime)
+            ) or (
+                isinstance(left, datetime.date) and isinstance(right, datetime.date)
+            ) or (
+                isinstance(left, datetime.time) and isinstance(right, datetime.time)
+            ) or (
+                isinstance(left, datetime.timedelta) and isinstance(right, datetime.timedelta)
+            ):
                 if not left < right:
                     return False
             else:
@@ -175,7 +232,17 @@ def bif_greater_than(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
             else:
                 right: any = interpreter.evaluate(node.args[i + 1])
                 evaluated_args[i + 1] = right
-            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            if (
+                    isinstance(left, (int, float)) and isinstance(right, (int, float))
+            ) or (
+                    isinstance(left, datetime.datetime) and isinstance(right, datetime.datetime)
+            ) or (
+                    isinstance(left, datetime.date) and isinstance(right, datetime.date)
+            ) or (
+                    isinstance(left, datetime.time) and isinstance(right, datetime.time)
+            ) or (
+                    isinstance(left, datetime.timedelta) and isinstance(right, datetime.timedelta)
+            ):
                 if not left > right:
                     return False
             else:
@@ -204,7 +271,17 @@ def bif_less_than_or_equal(interpreter: 'OQSInterpreter', node: FunctionNode) ->
             else:
                 right: any = interpreter.evaluate(node.args[i + 1])
                 evaluated_args[i + 1] = right
-            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            if (
+                    isinstance(left, (int, float)) and isinstance(right, (int, float))
+            ) or (
+                    isinstance(left, datetime.datetime) and isinstance(right, datetime.datetime)
+            ) or (
+                    isinstance(left, datetime.date) and isinstance(right, datetime.date)
+            ) or (
+                    isinstance(left, datetime.time) and isinstance(right, datetime.time)
+            ) or (
+                    isinstance(left, datetime.timedelta) and isinstance(right, datetime.timedelta)
+            ):
                 if not left <= right:
                     return False
             else:
@@ -233,7 +310,17 @@ def bif_greater_than_or_equal(interpreter: 'OQSInterpreter', node: FunctionNode)
             else:
                 right: any = interpreter.evaluate(node.args[i + 1])
                 evaluated_args[i + 1] = right
-            if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+            if (
+                    isinstance(left, (int, float)) and isinstance(right, (int, float))
+            ) or (
+                    isinstance(left, datetime.datetime) and isinstance(right, datetime.datetime)
+            ) or (
+                    isinstance(left, datetime.date) and isinstance(right, datetime.date)
+            ) or (
+                    isinstance(left, datetime.time) and isinstance(right, datetime.time)
+            ) or (
+                    isinstance(left, datetime.timedelta) and isinstance(right, datetime.timedelta)
+            ):
                 if not left >= right:
                     return False
             else:
@@ -395,7 +482,7 @@ def bif_string(interpreter: 'OQSInterpreter', node: FunctionNode) -> str:
             function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
         )
     value: any = interpreter.evaluate(node.args[0])
-    return json.dumps(value)
+    return json.dumps(value, cls=OQSJSONEncoder)
 
 
 def bif_list(interpreter: 'OQSInterpreter', node: FunctionNode) -> list[any]:
@@ -865,3 +952,179 @@ def bif_in(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
             message=f"IN function requires a list or KVS as the second argument. "
                     f"Instead got '{get_oqs_type(collection)}'. "
         )
+
+
+def bif_date(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.date:
+    if len(node.args) != 3:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=3, actual=len(node.args)
+        )
+    year, month, day = [interpreter.evaluate(arg) for arg in node.args]
+    if not all(isinstance(i, int) for i in [year, month, day]):
+        raise OQSTypeError(
+            message=f"All arguments must be integers. Instead got the following types in order: "
+                    f"'{get_oqs_type(year)}', '{get_oqs_type(month)}', '{get_oqs_type(day)}'. "
+        )
+    try:
+        return datetime.date(year, month, day)
+    except ValueError as ve:
+        raise OQSValueError(message=str(ve))
+
+
+def bif_time(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.time:
+    if not (3 <= len(node.args) <= 4):
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=3, expected_max=4, actual=len(node.args)
+        )
+    hour, minute, second, *ms = [interpreter.evaluate(arg) for arg in node.args]
+    if not all(isinstance(i, int) for i in [hour, minute, second] + ms):
+        raise OQSTypeError(
+            message=f"All arguments must be integers. Instead got the following in order: "
+                    f"'{get_oqs_type(hour)}', '{get_oqs_type(minute)}', '{get_oqs_type(second)}'" +
+                    (f", '{get_oqs_type(ms[0])}'" if ms else '') + '.'
+        )
+    try:
+        return datetime.time(hour, minute, second, *ms)
+    except ValueError as ve:
+        raise OQSValueError(message=str(ve))
+
+
+def bif_datetime(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.datetime:
+    if not (6 <= len(node.args) <= 7):
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=6, expected_max=7, actual=len(node.args)
+        )
+    year, month, day, hour, minute, second, *ms = [interpreter.evaluate(arg) for arg in node.args]
+    if not all(isinstance(i, int) for i in [year, month, day, hour, minute, second] + ms):
+        raise OQSTypeError(
+            message=f"All arguments must be integers. Instead got the following in order: '{get_oqs_type(year)}', "
+                    f"'{get_oqs_type(month)}', '{get_oqs_type(day)}', '{get_oqs_type(hour)}', '{get_oqs_type(minute)}',"
+                    f"'{get_oqs_type(second)}'" + (f", '{get_oqs_type(ms[0])}'" if ms else '') + '.'
+        )
+    try:
+        return datetime.datetime(year, month, day, hour, minute, second, *ms)
+    except ValueError as ve:
+        raise OQSValueError(message=str(ve))
+
+
+def bif_duration(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.timedelta:
+    if not (4 <= len(node.args) <= 5):
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=4, expected_max=5, actual=len(node.args)
+        )
+    days, hours, minutes, seconds, *ms = [interpreter.evaluate(arg) for arg in node.args]
+    if not all(isinstance(i, int) for i in [days, hours, minutes, seconds] + ms):
+        raise OQSTypeError(
+            message=f"All arguments must be integers. Instead got the following in order: '{get_oqs_type(days)}', "
+                    f"'{get_oqs_type(hours)}', '{get_oqs_type(minutes)}', '{get_oqs_type(seconds)}'" +
+                    (f", '{get_oqs_type(ms[0])}'" if ms else '') + '.'
+        )
+    return datetime.timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds, microseconds=ms[0] if ms else 0)
+
+
+def bif_now(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.datetime:
+    if len(node.args) != 0:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=0, expected_max=0, actual=len(node.args)
+        )
+    return datetime.datetime.utcnow()
+
+
+def bif_today(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.date:
+    if len(node.args) != 0:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=0, expected_max=0, actual=len(node.args)
+        )
+    return datetime.date.today()
+
+
+def bif_time_now(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.time:
+    if len(node.args) != 0:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=0, expected_max=0, actual=len(node.args)
+        )
+    return datetime.utcnow().time()
+
+
+def bif_parse_temporal(
+        interpreter: 'OQSInterpreter', node: FunctionNode
+) -> datetime.datetime | datetime.date | datetime.time | datetime.timedelta:
+    if not (2 <= len(node.args) <= 3):
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=3, actual=len(node.args)
+        )
+    string, temporal_type, *optional_format = [interpreter.evaluate(arg) for arg in node.args]
+    if not all(isinstance(arg, str) for arg in [string, temporal_type] + optional_format):
+        raise OQSTypeError(
+            message=f"All arguments must be strings. Received types: '{get_oqs_type(string)}', "
+                    f"'{get_oqs_type(temporal_type)}'" +
+                    (f", '{get_oqs_type(optional_format[0])}'" if optional_format else '') + '.'
+        )
+    temporal_type: str = temporal_type.lower()
+    format_str: str | None = optional_format[0] if optional_format else None
+    try:
+        if temporal_type == "datetime":
+            default_format: str = "%Y-%m-%dT%H:%M:%S"
+            return datetime.datetime.strptime(string, format_str or default_format)
+        elif temporal_type == "date":
+            default_format: str = "%Y-%m-%d"
+            return datetime.datetime.strptime(string, format_str or default_format).date()
+        elif temporal_type == "time":
+            default_format: str = "%H:%M:%S"
+            return datetime.datetime.strptime(string, format_str or default_format).time()
+        elif temporal_type == "duration":
+            duration_pattern: str = r"(\d+)\s+(\d+):(\d+):(\d+)"
+            duration_match: re.Match | None = re.match(duration_pattern, string)
+            if duration_match:
+                days, hours, minutes, seconds = map(int, duration_match.groups())
+                return datetime.timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
+            else:
+                raise ValueError("Invalid duration format")
+        else:
+            raise ValueError("Invalid temporal type specified")
+
+    except ValueError as ve:
+        raise OQSValueError(message=str(ve))
+
+
+def bif_format_temporal(interpreter: 'OQSInterpreter', node: FunctionNode) -> str:
+    if len(node.args) != 2:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=2, expected_max=2, actual=len(node.args)
+        )
+    temporal, format_str = [interpreter.evaluate(arg) for arg in node.args]
+    if not isinstance(format_str, str):
+        raise OQSTypeError(
+            message=f"Format argument must be a string. Instead got '{get_oqs_type(format_str)}'."
+        )
+    if not isinstance(temporal, (datetime.datetime, datetime.date, datetime.time, datetime.timedelta)):
+        raise OQSTypeError(
+            message=f"First argument must be a Temporal type (Date, Time, DateTime, Duration). "
+                    f"Instead got '{get_oqs_type(temporal)}'."
+        )
+    try:
+        return temporal.strftime(format_str)
+    except ValueError as ve:
+        raise OQSValueError(message=str(ve))
+
+
+def bif_extract_date(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.date:
+    if len(node.args) != 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
+        )
+    datetime_obj: datetime.datetime = interpreter.evaluate(node.args[0])
+    if not isinstance(datetime_obj, datetime.datetime):
+        raise OQSTypeError(message=f"Argument must be a DateTime type. Instead got '{get_oqs_type(datetime_obj)}'.")
+    return datetime_obj.date()
+
+
+def bif_extract_time(interpreter: 'OQSInterpreter', node: FunctionNode) -> datetime.time:
+    if len(node.args) != 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
+        )
+    datetime_obj: datetime.datetime = interpreter.evaluate(node.args[0])
+    if not isinstance(datetime_obj, datetime.datetime):
+        raise OQSTypeError(message=f"Argument must be a DateTime type. Instead got '{get_oqs_type(datetime_obj)}'.")
+    return datetime_obj.time()

@@ -83,6 +83,7 @@ else:
     - **Amount**: A minimum of two inputs with no maximum.
     - **Types**: All input types must be of the same type being one of the following:
       - `Number`
+      - `Temporal`
       - `String`
       - `List`
       - `KVS`
@@ -93,6 +94,7 @@ else:
       - **Types**:
         - For numbers: Both `Number`. 
         - For strings/lists: Both `String` or `List`.
+        - For temporal: First argument should be a `Temporal` and the second argument should be a `Duration`.
   - **Outputs**: The same type as the inputs.
 - `MULTIPLY(argument1, argument2, ...)` - Multiplies numbers or repeats strings/lists:
   - **Inputs**:
@@ -118,22 +120,22 @@ else:
 - `LESS_THAN(argument1, argument2, ...)` - Compares if each preceding argument is less than its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is less than the next one, otherwise `false`.
 - `GREATER_THAN(argument1, argument2, ...)` - Compares if each preceding argument is greater than its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is greater than the next one, otherwise `false`.
 - `LESS_THAN_OR_EQUAL(argument1, argument2, ...)` - Compares if each preceding argument is less than or equal to its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is less than or equal to the next one, otherwise `false`.
 - `GREATER_THAN_OR_EQUAL(argument1, argument2, ...)` - Compares if each preceding argument is greater than or equal to its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is greater than or equal to the next one, otherwise `false`.
 - `EQUALS(argument1, argument2, ...)` - Compares if all arguments are equal:
   - **Inputs**:
@@ -181,7 +183,6 @@ else:
     - **Input**: `NOT(0)` **Output**: `true`
     - **Input**: `NOT("text")` **Output**: `false` (since "text" is truthy)
     - **Input**: `NOT(null)` **Output**: `true`
-
 - `INTEGER(argument)` - Converts to an integer representation:
   - **Inputs**:
     - **Amount**: Exactly one input.
@@ -236,12 +237,12 @@ else:
 - `MAX(number1, number2, ..., numberN)` - Finds the maximum number:
   - **Inputs**:
     - **Amount**: A minimum of two inputs with no maximum.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Number`.
 - `MIN(number1, number2, ..., numberN)` - Finds the minimum number:
   - **Inputs**:
     - **Amount**: A minimum of two inputs with no maximum.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Number`.
 - `SUM(list)` - Adds up items in a list:
   - **Inputs**:
@@ -345,7 +346,7 @@ else:
   - **Outputs**: Raises the specified error.
   - **Examples**:
     - **Input**: `RAISE("Syntax Error", "Invalid syntax")` **Output**: Raises a Syntax Error with the message "Invalid syntax".
-    - **Input**: `RAISE("NewError", "Custom error occurred")` **Output**: Raises a custom error named "NewError" with the message "Custom error occurred".
+    - **Input**: `RAISE("NewError", "Custom error occurred")` **Output**: Raises a custom error named "NewError" with the message "Custom error occurred". 
 - `FILTER(list/kvs, variable_name, predicate)` - Filters elements of a `List` or key-value pairs of a `KVS` based on a provided predicate expression:
   - **Inputs**:
     - **list/kvs**: The `List` or `KVS` to be filtered.
@@ -381,7 +382,7 @@ else:
   - **Examples**:
     - **Input**: `SLICE([1, 2, 3, 4, 5], 1, 3)` **Output**: `[2, 3]`
     - **Input**: `SLICE("Hello World", 6)` **Output**: `"World"`
-- `IN(value, list/kvs)` - Checks if a given value is present in a `List` or if a given key exists in a `KVS`.
+- `IN(value, list/kvs)` - Checks if a given value is present in a `List` or if a given key exists in a `KVS`:
   - **Inputs**:
     - **value**: The value or key to be checked. This can be of any type.
     - **list/kvs**: The `List` or `KVS` to be searched. If a `List` is provided, the function checks for the presence of the value in the `List`. If a `KVS` is provided, the function checks if the value is a key in the `KVS`.
@@ -391,6 +392,57 @@ else:
     - **Input**: `IN("b", {"a": 1, "b": 2, "c": 3})` **Output**: `true`
     - **Input**: `IN("z", [1, 2, 3, 4])` **Output**: `false`
     - **Input**: `IN("d", {"a": 1, "b": 2, "c": 3})` **Output**: `false`
+- `DATE(year, month, day)` - Creates a `Date` from specified year, month, and day:
+  - **Inputs**:
+    - **Amount**: Exactly three inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `Date`.
+- `TIME(hour, minute, second, [millisecond])` - Creates a `Time` from specified hour, minute, second, and optionally millisecond:
+  - **Inputs**:
+    - **Amount**: Three or four inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `Time`.
+- `DATETIME(year, month, day, hour, minute, second, [millisecond])` - Creates a `DateTime` from specified year, month, day, hour, minute, second, and optionally millisecond:
+  - **Inputs**:
+    - **Amount**: Six or seven inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `DateTime`.
+- `DURATION(days, hours, minutes, seconds, [milliseconds])` - Creates a `Duration` from specified days, hours, minutes, seconds, and optionally milliseconds:
+  - **Inputs**:
+    - **Amount**: Four or five inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `Duration`.
+- `NOW()` - Returns the current UTC `DateTime`:
+  - **Outputs**: `DateTime`.
+- `TODAY()` - Returns the current UTC `Date`.
+   - **Outputs**: `Date`.
+- `TIME_NOW()` - Returns the current UTC `Time`.
+  - **Outputs**: `Time`.
+- `PARSE_TEMPORAL(string, type, [format])` - Converts a `String` to the appropriate `Temporal` type (`DateTime`, `Date`, `Time`, `Duration`), optionally using a specified format. The optional format input will be ignored if the specified type is `Duration`:
+  - **Inputs**:
+    - **Amount**: One or two inputs.
+    - **Types**: First `String`, second `String` one of the Temporal subtypes (case-insensitive), third (optional) `String` (format pattern).
+  - **Outputs**: The appropriate `Temporal` type based on the input `String`.
+  - **Examples**:
+    - **Input**: `PARSE_TEMPORAL("2023-12-25T15:30:00", "DateTime")` **Output**: `DateTime(2023, 12, 25, 15, 30, 0)`
+    - **Input**: `PARSE_TEMPORAL("2023-12-25", "Date")` **Output**: `Date(2023, 12, 25)`
+    - **Input**: `PARSE_TEMPORAL("15:30:00", "Time")` **Output**: `Time(15, 30, 0)`
+    - **Input**: `PARSE_TEMPORAL("1 02:15:30", "Duration")` **Output**: `Duration(1, 2, 15, 30)`
+- `FORMAT_TEMPORAL(temporal, format)` - Formats a `Temporal` (`Date`, `Time`, `DateTime`, `Duration`) into a `String` using the specified format:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: First `Temporal` (`Date`, `Time`, `DateTime`, `Duration`), second `String` (format pattern).
+  - **Outputs**: `String`.
+- `EXTRACT_DATE(datetime)` - Extracts the `Date` component from a `DateTime`:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `DateTime`.
+  - **Outputs**: `Date`.
+- `EXTRACT_TIME(datetime)` - Extracts the `Time` component from a `DateTime`:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `DateTime`.
+  - **Outputs**: `Time`.
 
 Function calls are completed by putting the function name first and following it by putting an open parentheses `(` followed by any number of arguments separated by commas `,` and then followed by a closing parentheses `)`.
 

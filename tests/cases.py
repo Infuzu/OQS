@@ -2,6 +2,7 @@ import inspect
 import json
 from typing import Callable
 from unittest import TestCase
+from python_oqs_implementation.oqs.utils.conversion import OQSJSONEncoder
 from python_oqs_implementation.tests.test_end_to_end import (
     TestLanguageEngineAdvanced, TestLanguageEngine, TestOQSFunctions
 )
@@ -28,4 +29,4 @@ def generate_tests_json() -> None:
     }
 
     with open("tests.json", "w") as file:
-        json.dump(test_classes_data, file, indent=4)
+        json.dump(test_classes_data, file, indent=4, cls=OQSJSONEncoder)

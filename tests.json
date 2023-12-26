@@ -1450,6 +1450,66 @@
                 }
             }
         ],
+        "test_date_comparison": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"2023-12-26\", \"Date\") > PARSE_TEMPORAL(\"2023-12-25\", \"Date\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
+        "test_date_subtraction": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"2023-12-25\", \"Date\") - DURATION(1, 0, 0, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "2023-12-24",
+                        "type": "Date"
+                    }
+                }
+            }
+        ],
+        "test_datetime_addition": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"2023-12-25T10:00:00\", \"DateTime\") + DURATION(0, 1, 0, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "2023-12-25T11:00:00",
+                        "type": "DateTime"
+                    }
+                }
+            }
+        ],
+        "test_datetime_comparison": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"2023-12-24T10:00:00\", \"DateTime\") < PARSE_TEMPORAL(\"2023-12-25T10:00:00\", \"DateTime\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
         "test_decimal_function": [
             {
                 "input": {
@@ -1476,6 +1536,21 @@
                     "results": {
                         "value": 5,
                         "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_duration_subtraction": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"1 02:00:00\", \"Duration\") - PARSE_TEMPORAL(\"1 00:30:00\", \"Duration\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "1:30:00",
+                        "type": "Duration"
                     }
                 }
             }
@@ -1844,6 +1919,21 @@
                 }
             }
         ],
+        "test_time_addition": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"10:00:00\", \"Time\") + DURATION(0, 1, 0, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "11:00:00",
+                        "type": "Time"
+                    }
+                }
+            }
+        ],
         "test_unpacked_integer": [
             {
                 "input": {
@@ -2037,6 +2127,36 @@
                 }
             }
         ],
+        "test_date_function": [
+            {
+                "input": {
+                    "expression": "DATE(2023, 12, 25)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "2023-12-25",
+                        "type": "Date"
+                    }
+                }
+            }
+        ],
+        "test_datetime_function": [
+            {
+                "input": {
+                    "expression": "DATETIME(2023, 12, 25, 10, 30, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "2023-12-25T10:30:00",
+                        "type": "DateTime"
+                    }
+                }
+            }
+        ],
         "test_decimal_conversion": [
             {
                 "input": {
@@ -2078,6 +2198,21 @@
                     "results": {
                         "value": 5,
                         "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_duration_function": [
+            {
+                "input": {
+                    "expression": "DURATION(0, 1, 2, 30)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "1:02:30",
+                        "type": "Duration"
                     }
                 }
             }
@@ -2196,6 +2331,21 @@
                             6
                         ],
                         "type": "List"
+                    }
+                }
+            }
+        ],
+        "test_format_temporal_function": [
+            {
+                "input": {
+                    "expression": "FORMAT_TEMPORAL(PARSE_TEMPORAL(\"2023-12-25T10:30:00\", \"DateTime\"), \"%Y-%m-%d\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "2023-12-25",
+                        "type": "String"
                     }
                 }
             }
@@ -2687,6 +2837,21 @@
                 }
             }
         ],
+        "test_parse_temporal_function": [
+            {
+                "input": {
+                    "expression": "PARSE_TEMPORAL(\"2023-12-25T10:30:00\", \"DateTime\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "2023-12-25T10:30:00",
+                        "type": "DateTime"
+                    }
+                }
+            }
+        ],
         "test_raise_function": [
             {
                 "input": {
@@ -2963,6 +3128,21 @@
                     "results": {
                         "value": 6,
                         "type": "Integer"
+                    }
+                }
+            }
+        ],
+        "test_time_function": [
+            {
+                "input": {
+                    "expression": "TIME(10, 30, 0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": "10:30:00",
+                        "type": "Time"
                     }
                 }
             }

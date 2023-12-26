@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.9
+## Version: 0.10
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -29,15 +29,20 @@ Engines are mandated to consider an optional boolean parameter `string_embedded`
 
 ### Type System
 `OQS` supports a core set of types, which are essential for numerous scenarios:
-- Numbers: Including the subtypes:
-  - Integers: Contains any numeric value not in quotations not containing any decimals `.`.
-  - Decimals: Contains any numeric value not in quotations containing a single decimal `.`. Values not containing a leading number such as `.5` are still considered valid decimals. The same goes for values ending with a decimal such as `5.`
-- Booleans: Contains the values `true` and `false`.
-- Lists: Any number of values surrounded by square brackets `[]` and commas seperated when containing more than 1 value. Examples include `[1, "5"]` or `[1]`. Lists can contain a mixture of types. Lists maintain their order.
-- Strings: Values surrounded by double-quotes `"value"` or single-quotes `'value'`. Empty strings are valid strings as well such as `''`.
-- Functions: Functions can be callable using `()` after the function name. Function names must start with an alphabetic character followed by any number of alphanumeric characters and underscores or combination thereof.
-- Nulls: Contains only the value `null` to indicate nothing.
-- Key-Value Stores (KVS): Enclosed in `{}`, keys are strings, values van be any type, including nested KVS. It can be empty.
+- `Number`: Including the subtypes:
+  - `Integer`: Contains any numeric value not in quotations not containing any decimals `.`.
+  - `Decimal`: Contains any numeric value not in quotations containing a single decimal `.`. Values not containing a leading number such as `.5` are still considered valid `Decimal`s. The same goes for values ending with a decimal such as `5.`
+- `Boolean`: Contains the values `true` and `false`.
+- `List`: Any number of values surrounded by square brackets `[]` and commas seperated when containing more than 1 value. Examples include `[1, "5"]` or `[1]`. Lists can contain a mixture of types. `List`s maintain their order.
+- `String`: Values surrounded by double-quotes `"value"` or single-quotes `'value'`. Empty `String`s are valid strings as well such as `''`.
+- `Function`: `Function`s can be callable using `()` after the function name. `Function` names must start with an alphabetic character followed by any number of alphanumeric characters and underscores or combination thereof.
+- `Null`: Contains only the value `null` to indicate nothing.
+- `Key-Value Store` (`KVS`): Enclosed in `{}`, keys are strings, values van be any type, including nested `KVS`. It can be empty.
+- `Temporal`: Including the subtypes:
+  - `DateTime`: Represents both date and time - **Format**: `YYYY-MM-DDTHH:MM:SS`, e.g., `2023-12-25T15:30:00`.
+  - `Date`: Represents only the date - **Format**: `YYYY-MM-DD`, e.g., `2023-12-25`.
+  - `Time`: Represents only the time - **Format**: `HH:MM:SS`, e.g., `15:30:00`.
+  - `Duration`: Represents a duration of time - **Format**: `HH:MM:SS`, e.g., `02:15:30` for 2 hours, 15 minutes, and 30 seconds.
 
 
 ### Supported Operators
@@ -72,6 +77,25 @@ Operators, which are foundational to the interaction between types, are clarifie
 - Subtraction `-`: Removes all instances of the entirety of the second string from the first string.
 - Repetition `*`L Repeats a string by the multiplier specified (must be a non-negative integer).
 
+#### Temporal Operators
+- **Addition (`+`)**:
+  - For `DateTime` + `Duration`: Adds the duration to the date-time. 
+  - For `Date` + `Duration`: Adds the duration to the date. 
+  - For `Time` + `Duration`: Adds the duration to the time. 
+  - For `Duration` + `Duration`: Adds two durations together. 
+- **Subtraction (`-`)**:
+  - For `DateTime` - `Duration`: Subtracts the duration from the date-time. 
+  - For `Date` - `Duration`: Subtracts the duration from the date. 
+  - For `Time` - `Duration`: Subtracts the duration from the time. 
+  - For `Duration` - `Duration`: Subtracts one duration from another. 
+  - For `DateTime` - `DateTime`: Calculates the duration between two date-times. 
+  - For `Date` - `Date`: Calculates the duration between two dates.
+- **Comparison (`<`, `>`, `<=`, `>=`, `==`, `!=`, `!==`, `!==`)**:
+  - Less-than (`<`) and Greater-than (`>`): Used to determine if one `Temporal` value is chronologically earlier or later than another. 
+  - Less-than-or-equal-to (`<=`) and Greater-than-or-equal-to (`>=`): Similar to `<` and `>`, but also return `True` if the values are equal. 
+  - Equal (`==`) and Not-equal (`!=`): Check if two `Temporal` values are exactly the same or not. 
+  - Strictly equal (`===`) and Strictly not equal (`!==`): Similar to `==` and `!=`, but also consider the type of temporal values.
+
 #### Function Invocation
 - The syntax for invoking functions is an identifier that starts with a letter followed by any combination of letters, numbers, or underscores, then an opening parenthesis `(`, an optional comma-seperated list of arguments, and a closing parentheses `)`.
 
@@ -103,30 +127,44 @@ Failing to respect this order will lead to incorrect results and may cause error
 ### Type Interactions 
 Interactions between types are explicitly defined within `OQS` as follows:
 
-| Operator | Operand 1 | Operand 2 | Result   |
-|---------|-----------|-----------|----------|
-| +       | Number    | Number    | Number   |
-| +       | List      | List      | List     |
-| +       | KVS       | KVS       | KVS      |
-| +       | String    | String    | String   |
-| -       | Number    | Number    | Number   |
-| -       | List      | List      | List     |
-| -       | String    | String    | String   |
-| *       | Number    | Number    | Number   |
-| *       | String    | Integer   | String   |
-| /       | Number    | Number    | Number   |
-| **      | Number    | Number    | Number   |
-| %       | Number    | Number    | Number   |
-| <       | Number    | Number    | Boolean  |
-| <=      | Number    | Number    | Boolean  |
-| ==      | Any Type  | Any Type  | Boolean  |
-| !=      | Any Type  | Any Type  | Boolean  |
-| ===     | Any Type  | Any Type  | Boolean  |
-| !==     | Any Type  | Any Type  | Boolean  |
-| >       | Number    | Number    | Boolean  |
-| >=      | Number    | Number    | Boolean  |
-| &       | Any Type  | Any Type  | Boolean  |
-| \|      | Any Type  | Any Type  | Boolean  |
+| Operator | Operand 1  | Operand 2  | Result    |
+|----------|------------|------------|-----------|
+| +        | Number     | Number     | Number    |
+| +        | List       | List       | List      |
+| +        | KVS        | KVS        | KVS       |
+| +        | String     | String     | String    |
+| +        | DateTime   | Duration   | DateTime  |
+| +        | Date       | Duration   | Date      |
+| +        | Time       | Duration   | Time      |
+| +        | Duration   | Duration   | Duration  |
+| -        | Number     | Number     | Number    |
+| -        | List       | List       | List      |
+| -        | String     | String     | String    |
+| -        | DateTime   | Duration   | DateTime  |
+| -        | Date       | Duration   | Date      |
+| -        | Time       | Duration   | Time      |
+| -        | Duration   | Duration   | Duration  |
+| -        | DateTime   | DateTime   | Duration  |
+| -        | Date       | Date       | Duration  |
+| *        | Number     | Number     | Number    |
+| *        | String     | Integer    | String    |
+| /        | Number     | Number     | Number    |
+| **       | Number     | Number     | Number    |
+| %        | Number     | Number     | Number    |
+| <        | Number     | Number     | Boolean   |
+| <        | Temporal   | Temporal   | Boolean   |
+| >        | Number     | Number     | Boolean   |
+| >        | Temporal   | Temporal   | Boolean   |
+| <=       | Number     | Number     | Boolean   |
+| <=       | Temporal   | Temporal   | Boolean   |
+| >=       | Number     | Number     | Boolean   |
+| >=       | Temporal   | Temporal   | Boolean   |
+| ==       | Any Type   | Any Type   | Boolean   |
+| !=       | Any Type   | Any Type   | Boolean   |
+| ===      | Any Type   | Any Type   | Boolean   |
+| !==      | Any Type   | Any Type   | Boolean   |
+| &        | Any Type   | Any Type   | Boolean   |
+| \|       | Any Type   | Any Type   | Boolean   |
 
 ("Any Type" indicates compatibility for comparisons between operands sharing a type.)
 
@@ -148,18 +186,21 @@ Interactions between types are explicitly defined within `OQS` as follows:
     - **Missing Expected Character Error**
       - Raised when an expected character is missing in the expression. 
       - Example: `ADD(5, 6` (missing closing parenthesis).
-- **Type Error**
+- **Type Error**:
   - Raised when an operation is performed on incompatible types. 
   - Example: `"Hello" - 5` (string and integer). 
-- **Undefined Variable Error**
+- **Value Error**:
+  - Raised when a function or operation receives inputs with invalid values. 
+  - Example: `DATE(2023, 2, 31)` → "Value Error: Day '31' is not valid for month '2'."
+- **Undefined Variable Error**:
   - Raised when an expression refers to a variable that has not been defined. 
   - Example: `x + 2` where `x` is undefined. 
-- **Undefined Function Error**
+- **Undefined Function Error**:
   - Raised when an expression calls a function that does not exist. 
   - Example: `NONEXISTENT_FUNCTION(1, 2)`. 
-- **Function Evaluation Error**
+- **Function Evaluation Error**:
   - Raised when an error occurs within the execution of a function. 
-- **Division By Zero Error**
+- **Division By Zero Error**:
   - Raised when an attempt is made to divide by zero. 
   - Example: `10 / 0`. 
 
@@ -187,6 +228,7 @@ Interactions between types are explicitly defined within `OQS` as follows:
     - **Amount**: A minimum of two inputs with no maximum.
     - **Types**: All input types must be of the same type being one of the following:
       - `Number`
+      - `Temporal`
       - `String`
       - `List`
       - `KVS`
@@ -197,6 +239,7 @@ Interactions between types are explicitly defined within `OQS` as follows:
       - **Types**:
         - For numbers: Both `Number`. 
         - For strings/lists: Both `String` or `List`.
+        - For temporal: First argument should be a `Temporal` and the second argument should be a `Duration`.
   - **Outputs**: The same type as the inputs.
 - `MULTIPLY(argument1, argument2, ...)` - Multiplies numbers or repeats strings/lists:
   - **Inputs**:
@@ -222,22 +265,22 @@ Interactions between types are explicitly defined within `OQS` as follows:
 - `LESS_THAN(argument1, argument2, ...)` - Compares if each preceding argument is less than its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is less than the next one, otherwise `false`.
 - `GREATER_THAN(argument1, argument2, ...)` - Compares if each preceding argument is greater than its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is greater than the next one, otherwise `false`.
 - `LESS_THAN_OR_EQUAL(argument1, argument2, ...)` - Compares if each preceding argument is less than or equal to its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is less than or equal to the next one, otherwise `false`.
 - `GREATER_THAN_OR_EQUAL(argument1, argument2, ...)` - Compares if each preceding argument is greater than or equal to its following argument:
   - **Inputs**:
     - **Amount**: Two or more inputs.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Boolean` - Returns `true` if each argument is greater than or equal to the next one, otherwise `false`.
 - `EQUALS(argument1, argument2, ...)` - Compares if all arguments are equal:
   - **Inputs**:
@@ -339,12 +382,12 @@ Interactions between types are explicitly defined within `OQS` as follows:
 - `MAX(number1, number2, ..., numberN)` - Finds the maximum number:
   - **Inputs**:
     - **Amount**: A minimum of two inputs with no maximum.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Number`.
 - `MIN(number1, number2, ..., numberN)` - Finds the minimum number:
   - **Inputs**:
     - **Amount**: A minimum of two inputs with no maximum.
-    - **Types**: All inputs must be `Number`.
+    - **Types**: All inputs must be `Number` or all inputs must be of the same `Temporal` subtype.
   - **Outputs**: `Number`.
 - `SUM(list)` - Adds up items in a list:
   - **Inputs**:
@@ -484,7 +527,7 @@ Interactions between types are explicitly defined within `OQS` as follows:
   - **Examples**:
     - **Input**: `SLICE([1, 2, 3, 4, 5], 1, 3)` **Output**: `[2, 3]`
     - **Input**: `SLICE("Hello World", 6)` **Output**: `"World"`
-- `IN(value, list/kvs)` - Checks if a given value is present in a `List` or if a given key exists in a `KVS`.
+- `IN(value, list/kvs)` - Checks if a given value is present in a `List` or if a given key exists in a `KVS`:
   - **Inputs**:
     - **value**: The value or key to be checked. This can be of any type.
     - **list/kvs**: The `List` or `KVS` to be searched. If a `List` is provided, the function checks for the presence of the value in the `List`. If a `KVS` is provided, the function checks if the value is a key in the `KVS`.
@@ -494,6 +537,60 @@ Interactions between types are explicitly defined within `OQS` as follows:
     - **Input**: `IN("b", {"a": 1, "b": 2, "c": 3})` **Output**: `true`
     - **Input**: `IN("z", [1, 2, 3, 4])` **Output**: `false`
     - **Input**: `IN("d", {"a": 1, "b": 2, "c": 3})` **Output**: `false`
+- `DATE(year, month, day)` - Creates a `Date` from specified year, month, and day:
+  - **Inputs**:
+    - **Amount**: Exactly three inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `Date`.
+- `TIME(hour, minute, second, [millisecond])` - Creates a `Time` from specified hour, minute, second, and optionally millisecond:
+  - **Inputs**:
+    - **Amount**: Three or four inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `Time`.
+- `DATETIME(year, month, day, hour, minute, second, [millisecond])` - Creates a `DateTime` from specified year, month, day, hour, minute, second, and optionally millisecond:
+  - **Inputs**:
+    - **Amount**: Six or seven inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `DateTime`.
+- `DURATION(days, hours, minutes, seconds, [milliseconds])` - Creates a `Duration` from specified days, hours, minutes, seconds, and optionally milliseconds:
+  - **Inputs**:
+    - **Amount**: Four or five inputs.
+    - **Types**: All inputs must be `Integer`.
+  - **Outputs**: `Duration`.
+- `NOW()` - Returns the current UTC `DateTime`:
+  - **Outputs**: `DateTime`.
+- `TODAY()` - Returns the current UTC `Date`.
+   - **Outputs**: `Date`.
+- `TIME_NOW()` - Returns the current UTC `Time`.
+  - **Outputs**: `Time`.
+- `PARSE_TEMPORAL(string, type, [format])` - Converts a `String` to the appropriate `Temporal` type (`DateTime`, `Date`, `Time`, `Duration`), optionally using a specified format. The optional format input will be ignored if the specified type is `Duration`:
+  - **Inputs**:
+    - **Amount**: One or two inputs.
+    - **Types**: First `String`, second `String` one of the Temporal subtypes (case-insensitive), third (optional) `String` (format pattern).
+  - **Outputs**: The appropriate `Temporal` type based on the input `String`.
+  - **Examples**:
+    - **Input**: `PARSE_TEMPORAL("2023-12-25T15:30:00", "DateTime")` **Output**: `DateTime(2023, 12, 25, 15, 30, 0)`
+    - **Input**: `PARSE_TEMPORAL("2023-12-25", "Date")` **Output**: `Date(2023, 12, 25)`
+    - **Input**: `PARSE_TEMPORAL("15:30:00", "Time")` **Output**: `Time(15, 30, 0)`
+    - **Input**: `PARSE_TEMPORAL("1 02:15:30", "Duration")` **Output**: `Duration(1, 2, 15, 30)`
+- `FORMAT_TEMPORAL(temporal, format)` - Formats a `Temporal` (`Date`, `Time`, `DateTime`, `Duration`) into a `String` using the specified format:
+  - **Inputs**:
+    - **Amount**: Exactly two inputs.
+    - **Types**: First `Temporal` (`Date`, `Time`, `DateTime`, `Duration`), second `String` (format pattern).
+  - **Outputs**: `String`.
+- `EXTRACT_DATE(datetime)` - Extracts the `Date` component from a `DateTime`:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `DateTime`.
+  - **Outputs**: `Date`.
+- `EXTRACT_TIME(datetime)` - Extracts the `Time` component from a `DateTime`:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: `DateTime`.
+  - **Outputs**: `Time`.
+
+**Implementation Notes**:
+- **Format Strings**: The optional format strings in `PARSE_` and `FORMAT_TEMPORAL` functions should conform to standard date-time formatting conventions, allowing for custom date-time representations. It should follow the POSIX specification and the C standard for format codes.
 
 
 ### Case Sensitivity
@@ -580,7 +677,23 @@ Expressions evaluated in `OQS` should yield identical results across different i
 - **Parentheses**:
   - **Input**: 4 * (2 + 3) **Output**: 20 (Parentheses cause addition to be prioritized over multiplication)
   - **Input**: ((2 + 3) * 4) / 2 **Output**: 10 (Nested parentheses guide the sequence of operations)
+- **Temporal Addition and Subtraction**:
+  - **Input**: `ADD(DATETIME(2023, 12, 25, 10, 30, 0), DURATION(0, 2, 0, 0))` **Output**: `DATETIME(2023, 12, 25, 12, 30, 0)` (Adds 2 hours to the datetime)
+  - **Input**: `SUBTRACT(DATE(2023, 12, 25), DURATION(1, 0, 0, 0))` **Output**: `DATE(2023, 12, 24)` (Subtracts 1 day from the date)
+- **Temporal Comparisons**:
+  - **Input**: `LESS_THAN(DATE(2023, 12, 25), DATE(2024, 1, 1))` **Output**: `true` (Checks if one date is earlier than another)
+  - **Input**: `GREATER_THAN(TIME(15, 30, 0), TIME(14, 30, 0))` **Output**: `true` (Compares two times)
+- **Temporal Formatting and Parsing**:
+  - **Input**: `FORMAT_TEMPORAL(DATETIME(2023, 12, 25, 10, 30, 0), "%Y-%m-%d %H:%M:%S")` **Output**: `"2023-12-25 10:30:00"`
+  - **Input**: `PARSE_TEMPORAL("2023-12-25", "Date", "%Y-%m-%d")` **Output**: `DATE(2023, 12, 25)`
+- **Advanced Temporal Operations**:
+  - **Input**: `IF(GREATER_THAN(NOW(), DATETIME(2023, 12, 25, 0, 0, 0)), "After Christmas", "Before Christmas")` (Evaluates current time in relation to a specific datetime)
+  - **Input**: `LEN(SLICE("2023-12-25T15:30:00", 0, 10))` **Output**: `10` (Extracts the date part from a datetime string and calculates its length)
+- **Using Temporal Types in Complex Expressions**:
+  - **Input**: `ADD(DURATION(1, 0, 0, 0), IF(LESS_THAN(TIME_NOW(), TIME(12, 0, 0)), DURATION(0, 1, 0, 0), DURATION(0, 2, 0, 0)))` (Adds either 1 or 2 hours to a duration based on the current time)
+  - **Input**: `STRING(EXTRACT_DATE(NOW())) + " is today's date"` (Extracts the current date and converts it to a string for display)
 
+These examples highlight the versatility of `OQS` in handling temporal data, providing a clear demonstration of how the new temporal types can be effectively utilized in various scenarios.
 
 
 ### Implementation Recommendations
@@ -605,11 +718,11 @@ A model open-source implementation exemplifying these guidelines will be publish
 
 ## Future Plans
 In the future `OQS` hopes to build types and functions to interact with the following:
-- Date and Time
-- Duration
 - Email
 - Phone Number
 - Lat-Long (Location)
+
+Additionally, `OQS` hopes to implement handling of timezones and we encourage contribution in that area.
 
 ## Conclusion
 The `OQS` language is designed to enhance ease of adoption, establish a system-neutral scripting solution, and ensure uniformity and straightforwardness. Your contributions and feedback on these guidelines are warmly welcomed to guarantee that `OQS` can adequately satisfy a broad spectrum of applications and remain adaptable for impending developments.

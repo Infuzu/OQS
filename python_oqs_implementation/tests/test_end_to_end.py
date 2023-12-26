@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from python_oqs_implementation.oqs.constants.types import ErrorTypeStrings as ETS
 from .utils import language_engine_expected_result
@@ -105,6 +106,35 @@ class TestLanguageEngine(unittest.TestCase):
 
     def test_string_embedded_expression(self):
         self.leer('<{3 + 5}> is the answer', "8 is the answer", string_embedded=True)
+
+    def test_datetime_addition(self):
+        self.leer(
+            'PARSE_TEMPORAL("2023-12-25T10:00:00", "DateTime") + DURATION(0, 1, 0, 0)',
+            datetime.datetime(2023, 12, 25, 11, 0, 0)
+        )
+
+    def test_date_subtraction(self):
+        self.leer(
+            'PARSE_TEMPORAL("2023-12-25", "Date") - DURATION(1, 0, 0, 0)', datetime.date(2023, 12, 24)
+        )
+
+    def test_time_addition(self):
+        self.leer('PARSE_TEMPORAL("10:00:00", "Time") + DURATION(0, 1, 0, 0)', datetime.time(11, 0, 0))
+
+    def test_duration_subtraction(self):
+        self.leer(
+            'PARSE_TEMPORAL("1 02:00:00", "Duration") - PARSE_TEMPORAL("1 00:30:00", "Duration")',
+            datetime.timedelta(hours=1, minutes=30)
+        )
+
+    def test_datetime_comparison(self):
+        self.leer(
+            'PARSE_TEMPORAL("2023-12-24T10:00:00", "DateTime") < PARSE_TEMPORAL("2023-12-25T10:00:00", "DateTime")',
+            True
+        )
+
+    def test_date_comparison(self):
+        self.leer('PARSE_TEMPORAL("2023-12-26", "Date") > PARSE_TEMPORAL("2023-12-25", "Date")', True)
 
 
 class TestLanguageEngineAdvanced(unittest.TestCase):
@@ -497,25 +527,21 @@ class TestOQSFunctions(unittest.TestCase):
     def test_filter_kvs(self):
         self.leer('FILTER({"a": 1, "b": 2, "c": 3}, "value", value == 2)', {"b": 2})
 
-    # Tests for the SORT function
     def test_sort_list_ascending(self):
         self.leer('SORT([4, 1, 3, 2], "x", x)', [1, 2, 3, 4])
 
     def test_sort_list_descending(self):
         self.leer('SORT([4, 1, 3, 2], "x", x, true)', [4, 3, 2, 1])
 
-    # Tests for the FLATTEN function
     def test_flatten_list(self):
         self.leer('FLATTEN([[1, 2], [3, 4], [5]])', [1, 2, 3, 4, 5])
 
-    # Tests for the SLICE function
     def test_slice_list(self):
         self.leer('SLICE([1, 2, 3, 4, 5], 1, 3)', [2, 3])
 
     def test_slice_string(self):
         self.leer('SLICE("Hello World", 0, 5)', "Hello")
 
-    # Tests for the IN function
     def test_in_list(self):
         self.leer('IN(3, [1, 2, 3, 4])', True)
 
@@ -527,3 +553,21 @@ class TestOQSFunctions(unittest.TestCase):
 
     def test_not_in_kvs(self):
         self.leer('IN("d", {"a": 1, "b": 2, "c": 3})', False)
+
+    def test_date_function(self):
+        self.leer('DATE(2023, 12, 25)', datetime.date(2023, 12, 25))
+
+    def test_time_function(self):
+        self.leer('TIME(10, 30, 0)', datetime.time(10, 30, 0))
+
+    def test_datetime_function(self):
+        self.leer('DATETIME(2023, 12, 25, 10, 30, 0)', datetime.datetime(2023, 12, 25, 10, 30, 0))
+
+    def test_duration_function(self):
+        self.leer('DURATION(0, 1, 2, 30)', datetime.timedelta(hours=1, minutes=2, seconds=30))
+
+    def test_format_temporal_function(self):
+        self.leer('FORMAT_TEMPORAL(PARSE_TEMPORAL("2023-12-25T10:30:00", "DateTime"), "%Y-%m-%d")', "2023-12-25")
+
+    def test_parse_temporal_function(self):
+        self.leer('PARSE_TEMPORAL("2023-12-25T10:30:00", "DateTime")', datetime.datetime(2023, 12, 25, 10, 30, 0))

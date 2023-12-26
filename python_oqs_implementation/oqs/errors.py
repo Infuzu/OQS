@@ -44,6 +44,13 @@ class OQSTypeError(OQSBaseError):
         super().__init__(message=message)
 
 
+class OQSValueError(OQSBaseError):
+    READABLE_NAME: str = ETS.VALUE
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message=message)
+
+
 class OQSUndefinedVariableError(OQSBaseError):
     READABLE_NAME: str = ETS.UNDEFINED_VARIABLE
 
