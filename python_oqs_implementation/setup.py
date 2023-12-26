@@ -1,10 +1,6 @@
 from setuptools import (setup, find_packages)
 
 
-with open('./requirements.txt') as f:
-    requirements = f.read().splitlines()
-
-
 setup(
     name='oqs',
     version='0.10.1',
@@ -27,5 +23,4 @@ setup(
     ],
     python_requires='>=3.10',
     license_files=('../LICENSE.md',),
-    install_requires=requirements
 )
