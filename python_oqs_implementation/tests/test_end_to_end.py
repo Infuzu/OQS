@@ -156,6 +156,7 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
             variables={"text": "Hello"},
             string_embedded=True
         )
+        self.leer('<{2 * 5}> stars', "10 stars", string_embedded=True)
 
     def test_advanced_scenarios(self):
         self.leer('UNIQUE([***numbers, ***REVERSE(numbers)])', [1, 2, 3], variables={"numbers": [1, 2, 3]})
@@ -165,6 +166,8 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
             {"key": 5, "newKey": 10},
             variables={"kvs": {"key": 5}}
         )
+        self.leer('IF(ADD(1, 2) > 2, "Yes", "No")', "Yes")
+        self.leer('ADD(SUBTRACT(10, 5), MULTIPLY(2, 3))', 11)
 
     def test_advanced_numerical_operations(self):
         self.leer('MODULO(15, 4) + DIVIDE(20, 5)', 7)
@@ -287,6 +290,29 @@ class TestLanguageEngineAdvanced(unittest.TestCase):
         self.leer("4 + 2 * 3", 10)
         self.leer("5 + 6 / 3 - 1", 6)
         self.leer("5 - 6 / 3 + 1", 4)
+
+    def test_type_interactions(self):
+        self.leer('ADD(5, 2.5)', 7.5)
+        self.leer('ADD("Hello ", "World")', "Hello World")
+        self.leer('SUBTRACT([1, 2, 3], [2])', [1, 3])
+        self.leer('ADD({"a": 1}, {"b": 2})', {"a": 1, "b": 2})
+
+    def test_unpacking_and_kvs_expansion(self):
+        self.leer('ADD(***[1, 2, 3], ***[4, 5, 6])', 21)
+        self.leer('{***{"a": 1}, ***{"b": 2}}', {"a": 1, "b": 2})
+
+    def test_error_scenarios(self):
+        self.leer(
+            'ADD(1, "two")',
+            expected_type=ETS.TYPE,
+            expect_error=True,
+            error_message="Cannot add 'Integer' and 'String'")
+        self.leer(
+            'DIVIDE(1, 0)',
+            expected_type=ETS.DIVISION_BY_ZERO,
+            expect_error=True,
+            error_message="Division by zero results in undefined."
+        )
 
 
 class TestOQSFunctions(unittest.TestCase):

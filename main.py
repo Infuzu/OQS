@@ -6,7 +6,7 @@ from tests.cases import generate_tests_json
 def main():
     generate_tests_json()
     def expression(iteration: int = 1) -> str:
-        return 'EQUALS(2, 2, 2)'
+        return 'ADD(1, "two")'
     variables: dict[str, any] = {}
     string_embedded: bool = False
     for i in range(1):
