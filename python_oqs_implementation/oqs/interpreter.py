@@ -63,6 +63,7 @@ class OQSInterpreter:
         "STRICTLY_NOT_EQUALS": built_in_functions.bif_strictly_not_equals,
         "AND": built_in_functions.bif_and,
         "OR": built_in_functions.bif_or,
+        "NOT": built_in_functions.bif_not,
         "INTEGER": built_in_functions.bif_integer,
         "DECIMAL": built_in_functions.bif_decimal,
         "STRING": built_in_functions.bif_string,

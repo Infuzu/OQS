@@ -358,6 +358,15 @@ def bif_or(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
     return False
 
 
+def bif_not(interpreter: 'OQSInterpreter', node: FunctionNode) -> bool:
+    if len(node.args) != 1:
+        raise OQSInvalidArgumentQuantityError(
+            function_name=node.name, expected_min=1, expected_max=1, actual=len(node.args)
+        )
+    value: any = interpreter.evaluate(node.args[0])
+    return not bool(value)
+
+
 def bif_integer(interpreter: 'OQSInterpreter', node: FunctionNode) -> int:
     if len(node.args) != 1:
         raise OQSInvalidArgumentQuantityError(

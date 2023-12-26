@@ -1,5 +1,5 @@
 # `OQS` (Open Quick Script) Language Guidelines
-## Version: 0.8
+## Version: 0.9
 ## Overview
 This document establishes the comprehensive guidelines for the `OQS` (Open Quick Script) language. `OQS` aims to be a universally adoptable, streamlined, and system-neutral scripting language that integrates effortlessly into diverse platforms. `OQS` is not designed to be a feature complete programming language. Rather, it is designed to be a simple, yet powerful, expression engine. It is specifically crafted to process expressions encompassing fundamental types and operations, interpreting a solitary expression—optionally accompanied by a dictionary, map, or JSON containing variables—to yield a consistent and logical outcome.
 
@@ -275,6 +275,16 @@ Interactions between types are explicitly defined within `OQS` as follows:
   - **Examples**:
     - **Input**: `OR(false, 0, null, "text")` **Output**: `true`
     - **Input**: `OR(false, 0, "")` **Output**: `false`
+- `NOT(argument)` - Performs a logical NOT operation on the provided argument:
+  - **Inputs**:
+    - **Amount**: Exactly one input.
+    - **Types**: Any type, evaluated for its truthiness.
+  - **Outputs**: `Boolean` - Returns `true` if the argument is falsy, otherwise `false`.
+  - **Examples**:
+    - **Input**: `NOT(true)` **Output**: `false`
+    - **Input**: `NOT(0)` **Output**: `true`
+    - **Input**: `NOT("text")` **Output**: `false` (since "text" is truthy)
+    - **Input**: `NOT(null)` **Output**: `true`
 - `INTEGER(argument)` - Converts to an integer representation:
   - **Inputs**:
     - **Amount**: Exactly one input.

@@ -2365,6 +2365,99 @@
                 }
             }
         ],
+        "test_not_function": [
+            {
+                "input": {
+                    "expression": "NOT(true)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT(false)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT(0)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT(1)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT(\"\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT(\"text\")",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": false,
+                        "type": "Boolean"
+                    }
+                }
+            },
+            {
+                "input": {
+                    "expression": "NOT(null)",
+                    "variables": null,
+                    "string_embedded": false
+                },
+                "output": {
+                    "results": {
+                        "value": true,
+                        "type": "Boolean"
+                    }
+                }
+            }
+        ],
         "test_not_in_kvs": [
             {
                 "input": {

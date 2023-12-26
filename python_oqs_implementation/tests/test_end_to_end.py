@@ -394,6 +394,15 @@ class TestOQSFunctions(unittest.TestCase):
         self.leer('OR(false, 0, "")', False)
         self.leer('OR(null, 0, false, "")', False)
 
+    def test_not_function(self):
+        self.leer('NOT(true)', False)
+        self.leer('NOT(false)', True)
+        self.leer('NOT(0)', True)
+        self.leer('NOT(1)', False)
+        self.leer('NOT("")', True)
+        self.leer('NOT("text")', False)
+        self.leer('NOT(null)', True)
+
     def test_keys_function(self):
         self.leer('KEYS({"name": "OQS", "type": "script"})', ["name", "type"])
 
