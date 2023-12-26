@@ -1,7 +1,7 @@
 from setuptools import (setup, find_packages)
 
 
-with open('python_oqs_implementation/requirements.txt') as f:
+with open('./requirements.txt') as f:
     requirements = f.read().splitlines()
 
 
